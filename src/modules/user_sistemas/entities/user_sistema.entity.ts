@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Persona } from 'src/modules/personas/entities/persona.entity';
+//import { Persona } from 'src/modules/personas/entities/persona.entity';
 //   import { Asociacion } from './asociacion.entity';
 //   import { Aseguradora } from './aseguradora.entity';
 //   import { Vehiculo } from './vehiculo.entity';
@@ -39,11 +39,11 @@ export class UserSistema {
   @Column({ name: 'ap_materno', type: 'varchar', length: 100 })
   apMaterno: string;
 
-  @Column({ type: 'varchar', length: 50, unique: true })
-  usuario: string;
+  @Column({ name: 'usuario', type: 'varchar', length: 50, unique: true })
+  username: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  contrasena: string;
+  @Column({ name: 'contrasena', type: 'varchar', length: 255 })
+  password: string;
 
   @Column({ type: 'enum', enum: Rol })
   rol: Rol;
@@ -66,9 +66,10 @@ export class UserSistema {
   @UpdateDateColumn({ name: 'fecha_modificacion' })
   fecha_modificacion: Date; // Actuliza automaticamente cuando se modifica el registro
 
-  // Relaciones
-  @OneToMany(() => Persona, (persona) => persona.id_usuario)
-  personas: Persona[];
+  /*
+    // Relaciones
+  // @OneToMany(() => Persona, (persona) => persona.id_usuario)
+  // personas: Persona[];
 
   // @OneToMany(() => Asociacion, asociacion => asociacion.id_usuario)
   // asociaciones: Asociacion[];
@@ -90,4 +91,5 @@ export class UserSistema {
 
   // @OneToMany(() => Tuc, tuc => tuc.id_usuario)
   // tucs: Tuc[];
+  */
 }

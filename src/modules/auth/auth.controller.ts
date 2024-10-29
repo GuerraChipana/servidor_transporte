@@ -1,36 +1,29 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { LoginDto } from './dto/login.dto';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('Auth')
-@Controller('auth')
+@ApiTags('Endpoints para Login')
+@Controller('Login')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @HttpCode(201)
   @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  @ApiBody({ type: LoginDto })
+  @ApiResponse({ status: 201, description: 'Ingresado con exito.' })
+  @ApiResponse({ status: 500, description: 'Error interno de servidor.' })
+  async login(@Body() loginDto: LoginDto) {
+    try {
+      return await this.authService.login(loginDto);
+    } catch (error) {
+      throw new UnauthorizedException('Credenciales Invalidas');
+    }
   }
 }
