@@ -6,16 +6,18 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Habilitar CORS si es necesario
+  app.enableCors();
+
   // Configuración de Swagger
   const config = new DocumentBuilder()
-    .setTitle('Documentación de las APIS ')
+    .setTitle('Documentación de las APIs')
     .setDescription(
-      'Esta es la documentacion para el Sistema de Transporte con todos sus controladores',
+      'Esta es la documentación para el Sistema de Transporte con todos sus controladores',
     )
     .setVersion('1.0')
-    .addTag('Auth')
-    .addTag('Usuarios de Sistema')
-    .addTag('Personas')
+    .addTag('Endpoints para Login')
+    .addTag('Endpoints de Usuarios de Sistemas')
     .build();
 
   // Generación de la documentación
@@ -23,9 +25,15 @@ async function bootstrap() {
   SwaggerModule.setup('documentacion', app, document);
 
   // Uso de ValidationPipe globalmente
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
 
-  // Escuchar el puerto 5000 en caso no se tenga el valor de PORT
+  // Escucha el puerto 5000 en caso no se tenga el valor de PORT
   await app.listen(process.env.PORT || 5000);
 }
 

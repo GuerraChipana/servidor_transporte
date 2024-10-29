@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { PersonasModule } from './modules/personas/personas.module';
+
 import { UserSistemasModule } from './modules/user_sistemas/user_sistemas.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { join } from 'path';
 
 @Module({
   imports: [
+    AuthModule,
     ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
@@ -18,15 +18,13 @@ import { AuthModule } from './modules/auth/auth.module';
         username: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_DATABASE,
-        entities: [__dirname + '/**/*.entity{.ts,js}'], //Lo q hace esto es leer todas las entidades sea js,jt
+        entities: [join(__dirname + '/**/*.entity.{ts,js}')],
         synchronize: false,
       }),
     }),
-    PersonasModule,
     UserSistemasModule,
-    AuthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
