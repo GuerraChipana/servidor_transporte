@@ -20,13 +20,36 @@ export class UserSistemasService {
     private userSistemaRepository: Repository<UserSistema>,
   ) {}
 
-  // Servicio para crear usuarios
   async create(
     createUserSistemaDto: CreateUserSistemaDto,
     id_usuario: number,
     rol: string,
   ): Promise<UserSistema> {
-    // Verificacion de rol del creador
+    // Verifica si el usuario ya existe por username
+    const existingUserByUsername = await this.userSistemaRepository.findOne({
+      where: { username: createUserSistemaDto.username },
+    });
+    if (existingUserByUsername) {
+      throw new BadRequestException('El nombre de usuario ya está en uso');
+    }
+
+    // Verifica si el DNI ya está en uso
+    const existingUserByDNI = await this.userSistemaRepository.findOne({
+      where: { dni: createUserSistemaDto.dni },
+    });
+    if (existingUserByDNI) {
+      throw new BadRequestException('El DNI ya está en uso');
+    }
+
+    // Verifica si el correo electrónico ya está en uso
+    const existingUserByEmail = await this.userSistemaRepository.findOne({
+      where: { email: createUserSistemaDto.email },
+    });
+    if (existingUserByEmail) {
+      throw new BadRequestException('El correo electrónico ya está en uso');
+    }
+
+    // Verificación de rol del creador
     if (
       rol === 'administrador' &&
       (createUserSistemaDto.rol === 'superadministrador' ||
@@ -43,15 +66,15 @@ export class UserSistemasService {
     // Crear una instancia de UserSistema
     const newUser = this.userSistemaRepository.create({
       ...createUserSistemaDto,
-      password: hashedPassword, // Almacena la contraseña cifrada
-      id_usuario, // Asigna el ID del usuario que crea el nuevo usuario
+      password: hashedPassword,
+      id_usuario,
     });
 
     // Guarda el nuevo usuario en la base de datos
     return await this.userSistemaRepository.save(newUser);
   }
 
-  // Servicio para obtener todos los usuarios
+  //  Servicio para obtener todos los usuarios    //
   async findAll(rol: string): Promise<UserSistema[]> {
     const usuarios = await this.userSistemaRepository.find();
 
@@ -65,7 +88,7 @@ export class UserSistemasService {
       : usuarios; // Muestra todo para superadmin
   }
 
-  // Servicio para encontrar un usuario por ID
+  // Servicio para encontrar un usuario por ID    //
   async findOne(id_user: number): Promise<UserSistema> {
     const user = await this.userSistemaRepository.findOne({
       where: { id_user }, // Busca el usuario por ID
@@ -115,21 +138,42 @@ export class UserSistemasService {
     const user = await this.findOne(id_user);
 
     // Verificar la contraseña actual
-    const esContraseñaCorrecta = await bcrypt.compare(
-      dto.password_actual,
-      user.password,
-    );
-    if (!esContraseñaCorrecta) {
+    if (
+      !dto.password_actual ||
+      !(await bcrypt.compare(dto.password_actual, user.password))
+    ) {
       throw new ForbiddenException('La contraseña actual es incorrecta');
     }
 
-    // Cambiar el nombre de usuario si se proporciona
-    if (dto.username) {
+    // Cambiar el nombre de usuario si se proporciona y es diferente
+    if (dto.username && dto.username !== user.username) {
+      const existingUser = await this.userSistemaRepository.findOne({
+        where: { username: dto.username },
+      });
+      if (existingUser) {
+        throw new BadRequestException('El nombre de usuario ya está en uso');
+      }
       user.username = dto.username;
     }
 
-    // Cambiar la contraseña si se proporciona
+    // Cambiar el correo electrónico si se proporciona y es diferente
+    if (dto.email && dto.email !== user.email) {
+      const existingEmail = await this.userSistemaRepository.findOne({
+        where: { email: dto.email },
+      });
+      if (existingEmail) {
+        throw new BadRequestException('El correo electrónico ya está en uso');
+      }
+      user.email = dto.email;
+    }
+
+    // Cambiar la contraseña si se proporciona y es diferente
     if (dto.password_nueva) {
+      if (dto.password_nueva === dto.password_actual) {
+        throw new BadRequestException(
+          'La nueva contraseña no puede ser la misma que la actual',
+        );
+      }
       if (dto.password_nueva !== dto.confirmacion_password) {
         throw new ForbiddenException(
           'La nueva contraseña y la confirmación no coinciden',
@@ -137,10 +181,6 @@ export class UserSistemasService {
       }
       user.password = await bcrypt.hash(dto.password_nueva, 10);
     }
-
-    // Guardar el ID del usuario que realiza la modificación y actualizar la fecha
-    user.id_usuario_modificacion = id_user; // o id_usuario_modificacion si es diferente
-    user.fecha_modificacion = new Date();
 
     // Guardar los cambios en la base de datos
     return await this.userSistemaRepository.save(user);
