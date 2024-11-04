@@ -7,11 +7,11 @@ import {
   ValidateIf,
 } from 'class-validator';
 
-export class CambioEstadoUserDto {
+export class CambioEstadoPersonaDto {
   @ApiProperty({
     minimum: 0,
     maximum: 1,
-    description: 'Estado del usuario (activo = 1, inactivo = 0)',
+    description: 'Estado de la persona (activo = 1, inactivo = 0)',
   })
   @IsNotEmpty()
   @IsIn([0, 1])
