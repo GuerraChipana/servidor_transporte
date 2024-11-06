@@ -45,7 +45,7 @@ export class PersonaService {
 
     // Llamada a la API
     const apiUrl = `${process.env.RENIEC_API}?nuDniConsulta=${dni}&nuDniUsuario=${process.env.RENIEC_USER}&nuRucUsuario=${process.env.RENIEC_RUC}&password=${process.env.RENIEC_PASSWORD}&out=json`;
-    console.log('URL de la API:', apiUrl);
+    // console.log('URL de la API:', apiUrl);
 
     let personaData: DatosPersona;
     try {
@@ -82,9 +82,8 @@ export class PersonaService {
       );
     }
 
-    // Crear la URL completa de la imagen
-    const baseUrl = `${process.env.BASE_URL}/imagenes/`;
-    const fullImageUrl = `${baseUrl}${imageUrl}`; // Combina la base URL con la ruta relativa
+
+    const fullImageUrl = imageUrl;
 
     // Validar si el DNI ya existe
     const existingPersonaByDni = await this.personaRepository.findOne({

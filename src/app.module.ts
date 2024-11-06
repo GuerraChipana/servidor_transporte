@@ -7,6 +7,7 @@ import { join } from 'path';
 import { PersonasModule } from './modules/personas/personas.module';
 import { ImagenesModule } from './modules/imagenes/imagenes.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { AsociacionesModule } from './modules/asociaciones/asociaciones.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
       rootPath: join(__dirname, '..', 'imagenes'), // Ruta donde se almacenan las imágenes
       serveRoot: '/imagenes/', // Ruta base para acceder a las imágenes
     }),
+    AsociacionesModule,
   ],
   controllers: [],
   providers: [],
