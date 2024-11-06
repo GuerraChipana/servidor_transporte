@@ -27,7 +27,10 @@ export class ImagenesService {
     const filePath = join(dirPath, file.originalname);
     try {
       await fs.writeFile(filePath, file.buffer); // Escribe el archivo en el sistema
-      return `${subFolder}/${file.originalname}`; // Retorna la ruta relativa
+
+      // Construccion de la URL
+      const baseUrl = process.env.BASE_URL ;
+      return `${baseUrl}/imagenes/${subFolder}/${file.originalname}`;
     } catch (error) {
       throw new BadRequestException(
         'Error al subir la imagen: ' + error.message,

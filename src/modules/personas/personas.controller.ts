@@ -28,13 +28,12 @@ interface UserRequest extends Request {
     rol: string;
   };
 }
-
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('Endpoints de Personas')
 @Controller('personas')
 export class PersonasController {
   constructor(private readonly personasService: PersonaService) {}
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @Post('registro')
   @HttpCode(201)
@@ -71,7 +70,6 @@ export class PersonasController {
     }
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(
     Rol.SUPERADMINISTRADOR,
     Rol.ADMINISTRADOR,
@@ -93,7 +91,6 @@ export class PersonasController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
   @ApiResponse({ status: 200, description: 'Persona encontrada.' })
   @ApiResponse({ status: 404, description: 'Persona no encontrada.' })
@@ -106,7 +103,6 @@ export class PersonasController {
     }
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @Patch(':id/estado')
   @ApiResponse({
@@ -135,7 +131,6 @@ export class PersonasController {
     }
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @Patch(':id')
   @ApiResponse({ status: 200, description: 'Persona actualizada.' })
