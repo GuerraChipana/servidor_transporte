@@ -7,13 +7,6 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Persona } from 'src/modules/personas/entities/persona.entity';
-//   import { Asociacion } from './asociacion.entity';
-//   import { Aseguradora } from './aseguradora.entity';
-//   import { Vehiculo } from './vehiculo.entity';
-//   import { VehiculoSeguro } from './vehiculo-seguro.entity';
-//   import { Conductor } from './conductor.entity';
-//   import { Empadronamiento } from './empadronamiento.entity';
-//   import { Tuc } from './tuc.entity';
 
 export enum Rol {
   SUPERADMINISTRADOR = 'superadministrador',
@@ -39,11 +32,14 @@ export class UserSistema {
   @Column({ name: 'ap_materno', type: 'varchar', length: 100 })
   apMaterno: string;
 
-  @Column({ type: 'varchar', length: 50, unique: true })
-  usuario: string;
+  @Column({ name: 'usuario', type: 'varchar', length: 50, unique: true })
+  username: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  contrasena: string;
+  @Column({ name: 'correo', type: 'varchar', length: 100, unique: true })
+  email: string;
+
+  @Column({ name: 'contrasena', type: 'varchar', length: 255 })
+  password: string;
 
   @Column({ type: 'enum', enum: Rol })
   rol: Rol;
@@ -61,33 +57,11 @@ export class UserSistema {
   id_usuario_modificacion: number;
 
   @CreateDateColumn({ name: 'fecha_registro' })
-  fecha_registro: Date; // Crea la fecha automaticamente cuando se agrega un registro
+  fecha_registro: Date;
 
   @UpdateDateColumn({ name: 'fecha_modificacion' })
-  fecha_modificacion: Date; // Actuliza automaticamente cuando se modifica el registro
+  fecha_modificacion: Date;
 
-  // Relaciones
   @OneToMany(() => Persona, (persona) => persona.id_usuario)
   personas: Persona[];
-
-  // @OneToMany(() => Asociacion, asociacion => asociacion.id_usuario)
-  // asociaciones: Asociacion[];
-
-  // @OneToMany(() => Aseguradora, aseguradora => aseguradora.id_usuario)
-  // aseguradoras: Aseguradora[];
-
-  // @OneToMany(() => Vehiculo, vehiculo => vehiculo.id_usuario)
-  // vehiculos: Vehiculo[];
-
-  // @OneToMany(() => VehiculoSeguro, vehiculoSeguro => vehiculoSeguro.id_usuario)
-  // vehiculoSeguros: VehiculoSeguro[];
-
-  // @OneToMany(() => Conductor, conductor => conductor.id_usuario)
-  // conductores: Conductor[];
-
-  // @OneToMany(() => Empadronamiento, empadronamiento => empadronamiento.id_usuario)
-  // empadronamientos: Empadronamiento[];
-
-  // @OneToMany(() => Tuc, tuc => tuc.id_usuario)
-  // tucs: Tuc[];
 }
