@@ -45,7 +45,7 @@ export class PersonaService {
 
     // Llamada a la API
     const apiUrl = `${process.env.RENIEC_API}?nuDniConsulta=${dni}&nuDniUsuario=${process.env.RENIEC_USER}&nuRucUsuario=${process.env.RENIEC_RUC}&password=${process.env.RENIEC_PASSWORD}&out=json`;
-    // console.log('URL de la API:', apiUrl);
+    console.log('URL de la API:', apiUrl);
 
     let personaData: DatosPersona;
     try {
@@ -200,7 +200,6 @@ export class PersonaService {
 
     // Asignar el usuario de modificación y la fecha
     persona.id_usuario_modificacion = usuarioModificacion.id_user;
-    persona.fecha_modificacion = new Date();
 
     // Guardar los cambios
     return await this.personaRepository.save(persona);
@@ -241,7 +240,6 @@ export class PersonaService {
 
     // Asignar el objeto de usuario de modificación
     persona.id_usuario_modificacion = usuarioModificacion.id_user;
-    persona.fecha_modificacion = new Date();
 
     // Guardar los cambios en la base de datos
     try {

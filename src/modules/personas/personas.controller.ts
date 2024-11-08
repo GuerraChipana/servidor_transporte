@@ -20,14 +20,8 @@ import { Roles } from '../auth/roles.decorator';
 import { Rol } from '../user_sistemas/entities/user_sistema.entity';
 import { UpdatePersonaDto } from './dto/update-persona.dto';
 import { CambioEstadoPersonaDto } from './dto/estado-persona.dto';
+import { UserRequestRequest } from 'src/modules/user-request.Request';
 
-interface UserRequest extends Request {
-  user: {
-    id: number;
-    username: string;
-    rol: string;
-  };
-}
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('Endpoints de Personas')
 @Controller('personas')
@@ -39,7 +33,10 @@ export class PersonasController {
   @HttpCode(201)
   @ApiResponse({ status: 201, description: 'Persona creada con éxito.' })
   @ApiResponse({ status: 500, description: 'Error al crear la persona.' })
-  async create(@Body() body: CreatePersonaDto, @Request() req: UserRequest) {
+  async create(
+    @Body() body: CreatePersonaDto,
+    @Request() req: UserRequestRequest,
+  ) {
     const userId = req.user.id;
 
     try {
@@ -78,7 +75,7 @@ export class PersonasController {
   )
   @Get()
   @ApiResponse({ status: 200, description: 'Lista de personas.' })
-  async listar(@Request() req: UserRequest) {
+  async listar(@Request() req: UserRequestRequest) {
     const rol = req.user.rol;
 
     try {
@@ -113,7 +110,7 @@ export class PersonasController {
   async changeStatus(
     @Param('id') id: number,
     @Body() cambioEstadoPersonaDto: CambioEstadoPersonaDto,
-    @Request() req: UserRequest,
+    @Request() req: UserRequestRequest,
   ) {
     const userId = req.user.id;
 
@@ -138,7 +135,7 @@ export class PersonasController {
   async update(
     @Param('id') id: number,
     @Body() updatePersonaDto: UpdatePersonaDto,
-    @Request() req: UserRequest,
+    @Request() req: UserRequestRequest,
   ) {
     const userId = req.user.id;
 

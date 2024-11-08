@@ -11,7 +11,7 @@ export class CambioEstadoAcociacionDto {
   @ApiProperty({
     minimum: 0,
     maximum: 1,
-    description: 'Estado de la persona (activo = 1, inactivo = 0)',
+    description: 'Estado de la asociacion (activo = 1, inactivo = 0)',
   })
   @IsNotEmpty()
   @IsIn([0, 1])

@@ -14,20 +14,14 @@ import {
 import { AsociacionesService } from './asociaciones.service';
 import { CreateAsociacioneDto } from './dto/create-asociacione.dto';
 import { UpdateAsociacioneDto } from './dto/update-asociacione.dto';
-import { ApiAcceptedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt.auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Rol } from '../user_sistemas/entities/user_sistema.entity';
 import { Roles } from '../auth/roles.decorator';
 import { CambioEstadoAcociacionDto } from './dto/cambio_estado-asociacione.dto';
+import { UserRequestRequest } from 'src/modules/user-request.Request';
 
-interface UserRequest extends Request {
-  user: {
-    id: number;
-    username: string;
-    rol: string;
-  };
-}
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiResponse({ status: 400, description: 'Mala petición' })
 @ApiTags('Endpoints de Asociaciones')
@@ -36,12 +30,12 @@ export class AsociacionesController {
   constructor(private readonly asociacionesService: AsociacionesService) {}
 
   @ApiResponse({ status: 201, description: 'Asociacion creada con éxito' })
-  @ApiResponse({ status: 500, description: 'Error al crear la perosna' })
+  @ApiResponse({ status: 500, description: 'Error al crear la aseguradora' })
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @Post()
   async create(
     @Body() createAsociacioneDto: CreateAsociacioneDto,
-    @Request() req: UserRequest,
+    @Request() req: UserRequestRequest,
   ) {
     const id_usuario = req.user.id;
     try {
@@ -62,8 +56,8 @@ export class AsociacionesController {
   )
   @ApiResponse({ status: 200, description: 'Listado de asociaciones completo' })
   @Get('listar')
-  findAll() {
-    return this.asociacionesService.findAll();
+  async findAll() {
+    return await this.asociacionesService.findAll();
   }
 
   @Roles(
@@ -92,7 +86,7 @@ export class AsociacionesController {
   async estado(
     @Param('id') id: number,
     @Body() cambioEstadoAcociacionDto: CambioEstadoAcociacionDto,
-    @Request() req: UserRequest,
+    @Request() req: UserRequestRequest,
   ) {
     const userId = req.user.id;
     try {
@@ -106,11 +100,13 @@ export class AsociacionesController {
     }
   }
 
+  @ApiResponse({ status: 202, description: 'Asociacion actualizada ' })
+  @ApiResponse({ status: 404, description: 'No encontrado' })
   @Patch('edit/:id')
   async edit(
     @Param('id') id: number,
     @Body() updateAsociacioneDto: UpdateAsociacioneDto,
-    @Request() req: UserRequest,
+    @Request() req: UserRequestRequest,
   ) {
     const userId = req.user.id;
 
