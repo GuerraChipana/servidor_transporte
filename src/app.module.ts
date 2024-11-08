@@ -8,6 +8,7 @@ import { PersonasModule } from './modules/personas/personas.module';
 import { ImagenesModule } from './modules/imagenes/imagenes.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { AsociacionesModule } from './modules/asociaciones/asociaciones.module';
+import { AseguradorasModule } from './modules/aseguradoras/aseguradoras.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AsociacionesModule } from './modules/asociaciones/asociaciones.module';
         username: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_DATABASE,
+        timezone: 'America/Lima',
         entities: [join(__dirname, '**/*.entity.{ts,js}')],
         synchronize: false,
       }),
@@ -33,6 +35,7 @@ import { AsociacionesModule } from './modules/asociaciones/asociaciones.module';
       serveRoot: '/imagenes/', // Ruta base para acceder a las imágenes
     }),
     AsociacionesModule,
+    AseguradorasModule,
   ],
   controllers: [],
   providers: [],

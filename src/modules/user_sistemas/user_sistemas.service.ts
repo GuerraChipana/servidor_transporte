@@ -120,8 +120,6 @@ export class UserSistemasService {
 
       // Guardar el ID del usuario que realiza la modificación y actualizar la fecha
       user.id_usuario_modificacion = id_usuario_modificacion;
-      user.fecha_modificacion = new Date();
-
       // Lo guarda en la base de datos
       return await this.userSistemaRepository.save(user);
     } catch (error) {
@@ -221,7 +219,6 @@ export class UserSistemasService {
       user.detalle_baja = null;
     }
     user.id_usuario_modificacion = id_usuario_modificacion;
-    user.fecha_modificacion = new Date();
     return await this.userSistemaRepository.save(user);
   }
 }
