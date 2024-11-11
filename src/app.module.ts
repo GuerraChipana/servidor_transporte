@@ -9,6 +9,7 @@ import { ImagenesModule } from './modules/imagenes/imagenes.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { AsociacionesModule } from './modules/asociaciones/asociaciones.module';
 import { AseguradorasModule } from './modules/aseguradoras/aseguradoras.module';
+import { ConductoresModule } from './modules/conductores/conductores.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { AseguradorasModule } from './modules/aseguradoras/aseguradoras.module';
     }),
     AsociacionesModule,
     AseguradorasModule,
+    ConductoresModule,
   ],
   controllers: [],
   providers: [],

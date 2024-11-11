@@ -61,7 +61,7 @@ export class AseguradorasController {
     return await this.aseguradorasService.findAll();
   }
 
-  // Endpoitns pra buscar por id
+  // Endpoitns para buscar por id
   @Roles(
     Rol.MODERADOR,
     Rol.ASISTENTE,

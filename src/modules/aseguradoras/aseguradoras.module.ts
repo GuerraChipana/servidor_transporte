@@ -11,12 +11,12 @@ import { Aseguradora } from './entities/aseguradora.entity';
   imports: [
     TypeOrmModule.forFeature([Aseguradora, UserSistema]),
     JwtModule.registerAsync({
+      inject: [ConfigService],
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: { expiresIn: '1h' },
       }),
-      inject: [ConfigService],
     }),
   ],
   controllers: [AseguradorasController],

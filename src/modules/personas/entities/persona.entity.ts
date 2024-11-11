@@ -6,8 +6,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   JoinColumn,
+  OneToOne,
 } from 'typeorm';
 import { UserSistema } from 'src/modules/user_sistemas/entities/user_sistema.entity';
+import { Conductore } from 'src/modules/conductores/entities/conductore.entity';
 
 @Entity('personas')
 export class Persona {
@@ -53,10 +55,13 @@ export class Persona {
 
   @Column()
   id_usuario_modificacion: number;
-  
+
   @CreateDateColumn({ name: 'fecha_registro' })
   fecha_registro: Date;
 
   @UpdateDateColumn({ name: 'fecha_modificacion' })
   fecha_modificacion: Date;
+
+  @OneToOne(() => Conductore, (conductor) => conductor.id_persona)
+  conductores: Conductore;
 }
