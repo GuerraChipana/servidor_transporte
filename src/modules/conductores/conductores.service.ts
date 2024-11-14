@@ -38,17 +38,19 @@ export class ConductoresService {
   ) {}
 
   private async validarLicencia(
-    createConductoreDto: CreateConductoreDto | UpdateConductoreDto,
+    createorUpdateDto: CreateConductoreDto | UpdateConductoreDto,
     id?: number,
   ) {
-    const licenciaExistente = await this.conductoreRepositorio.findOne({
-      where: {
-        n_licencia: createConductoreDto.n_licencia,
-        id: id ? Not(id) : undefined,
-      },
-    });
-    if (licenciaExistente) {
-      throw new BadRequestException('El numero de licencia ta existe');
+    if (createorUpdateDto.n_licencia) {
+      const licenciaExistente = await this.conductoreRepositorio.findOne({
+        where: {
+          n_licencia: createorUpdateDto.n_licencia,
+          id: id ? Not(id) : undefined,
+        },
+      });
+      if (licenciaExistente) {
+        throw new BadRequestException('El numero de licencia ya existe');
+      }
     }
   }
 

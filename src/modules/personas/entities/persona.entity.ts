@@ -7,9 +7,11 @@ import {
   UpdateDateColumn,
   JoinColumn,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 import { UserSistema } from 'src/modules/user_sistemas/entities/user_sistema.entity';
 import { Conductore } from 'src/modules/conductores/entities/conductore.entity';
+import { Vehiculo } from 'src/modules/vehiculos/entities/vehiculo.entity';
 
 @Entity('personas')
 export class Persona {
@@ -64,4 +66,11 @@ export class Persona {
 
   @OneToOne(() => Conductore, (conductor) => conductor.id_persona)
   conductores: Conductore;
+
+  // Relación con Vehiculos
+  @OneToMany(() => Vehiculo, (vehiculo) => vehiculo.propietario1) // Relación con los vehículos (propietario1)
+  vehiculosPropietario1: Vehiculo[];
+
+  @OneToMany(() => Vehiculo, (vehiculo) => vehiculo.propietario2) // Relación con los vehículos (propietario2)
+  vehiculosPropietario2: Vehiculo[];
 }
