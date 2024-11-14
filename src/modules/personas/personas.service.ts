@@ -13,7 +13,7 @@ import { lastValueFrom } from 'rxjs';
 import { ImagenesService } from '../imagenes/imagenes.service';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
-import { DatosPersona } from './datos-persona.interfas';
+import { DatosPersona } from './datos-persona.interface';
 import { UpdatePersonaDto } from './dto/update-persona.dto';
 import { CambioEstadoPersonaDto } from './dto/estado-persona.dto';
 

@@ -17,6 +17,66 @@ export class ImagenesService {
     );
   }
 
+  // Función para subir un archivo normal (JPG, PNG, etc.) y renombrarlo con el nombre que le pases
+  public async subirFileNormal(
+    file: Express.Multer.File,
+    newFileName: string, // Recibimos el nuevo nombre del archivo
+    subFolder: string = '', // Subcarpeta donde se almacenará la imagen
+  ): Promise<string> {
+    // Verifica que el archivo sea una imagen válida
+    const validExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+    const fileExtension = file.originalname.split('.').pop()?.toLowerCase();
+    if (!validExtensions.includes(`.${fileExtension}`)) {
+      throw new BadRequestException(
+        'Solo se permiten archivos de imagen (.jpg, .png, .gif)',
+      );
+    }
+
+    const dirPath = join(this.uploadDir, subFolder);
+    await fs.mkdir(dirPath, { recursive: true }); // Crea la subcarpeta si no existe
+
+    // Aseguramos que el nuevo nombre tenga la extensión correcta
+    const finalFileName = `${newFileName}.${fileExtension}`;
+
+    const filePath = join(dirPath, finalFileName);
+    try {
+      await fs.writeFile(filePath, file.buffer); // Escribe el archivo en el sistema
+
+      // Construcción de la URL
+      const baseUrl = process.env.BASE_URL;
+      return `${baseUrl}/imagenes/${subFolder}/${finalFileName}`;
+    } catch (error) {
+      throw new BadRequestException(
+        'Error al subir la imagen: ' + error.message,
+      );
+    }
+  }
+
+  // Función para eliminar una imagen
+  public async eliminarImagen(
+    fileName: string, // Nombre del archivo a eliminar
+    subFolder: string = '', // Subcarpeta donde se encuentra la imagen
+  ): Promise<string> {
+    const filePath = join(this.uploadDir, subFolder, fileName);
+
+    try {
+      // Verifica si el archivo existe
+      await fs.stat(filePath); // Si no existe, lanzará un error
+
+      // Elimina el archivo
+      await fs.unlink(filePath);
+
+      return `Imagen ${fileName} eliminada correctamente`;
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        throw new NotFoundException(`La imagen ${fileName} no fue encontrada`);
+      }
+      throw new BadRequestException(
+        'Error al eliminar la imagen: ' + error.message,
+      );
+    }
+  }
+
   // Función para subir un archivo a la carpeta local
   public async uploadImage(
     file: Express.Multer.File,
@@ -28,8 +88,8 @@ export class ImagenesService {
     try {
       await fs.writeFile(filePath, file.buffer); // Escribe el archivo en el sistema
 
-      // Construccion de la URL
-      const baseUrl = process.env.BASE_URL ;
+      // Construccion ddtoe la URL
+      const baseUrl = process.env.BASE_URL;
       return `${baseUrl}/imagenes/${subFolder}/${file.originalname}`;
     } catch (error) {
       throw new BadRequestException(

@@ -19,13 +19,13 @@ export class AseguradorasService {
 
   // Función privada asincrona para validar datos
   private async Validacion(
-    createAseguradoraDto: CreateAseguradoraDto | UpdateAseguradoraDto,
+    createUpdateaDto: CreateAseguradoraDto | UpdateAseguradoraDto,
     id?: number,
   ) {
-    if (createAseguradoraDto.aseguradora) {
+    if (createUpdateaDto.aseguradora) {
       const existeaseguradora = await this.aseguradoraRepository.findOne({
         where: {
-          aseguradora: createAseguradoraDto.aseguradora,
+          aseguradora: createUpdateaDto.aseguradora,
           id: id ? Not(id) : undefined,
         },
       });
