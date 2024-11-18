@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BeforeInsert,
+  BeforeUpdate, 
   OneToMany,
 } from 'typeorm';
 import { Persona } from 'src/modules/personas/entities/persona.entity';
@@ -88,6 +89,17 @@ export class Conductore {
     );
   }
 
+  // Hook antes de actualizar para recalcular la fecha de vencimiento
+  @BeforeUpdate()
+  updateFechaHasta() {
+    if (this.fecha_desde) {
+      // Solo recalcular si fecha_desde ha cambiado
+      this.fecha_hasta = this.calculateFechaHasta(
+        this.categoria,
+        this.fecha_desde,
+      );
+    }
+  }
   // Método para calcular la fecha de vencimiento de la licencia
   public calculateFechaHasta(
     categoria: CategoriaLicencia,
