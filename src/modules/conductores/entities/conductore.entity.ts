@@ -7,8 +7,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BeforeInsert,
+  BeforeUpdate, 
+  OneToMany,
 } from 'typeorm';
 import { Persona } from 'src/modules/personas/entities/persona.entity';
+import { DetalleConductore } from 'src/modules/detalle_conductores/entities/detalle_conductore.entity';
 
 export enum CategoriaLicencia {
   'B-I' = 'B-I',
@@ -27,7 +30,7 @@ export class Conductore {
   @JoinColumn({ name: 'id_persona' })
   id_persona: Persona;
 
-  @Column({ type: 'varchar', length: 25 })
+  @Column({ type: 'varchar', length: 25, unique: true })
   n_licencia: string;
 
   @Column({ type: 'date' })
@@ -74,6 +77,9 @@ export class Conductore {
   })
   fecha_modificacion: Date;
 
+  @OneToMany(() => DetalleConductore, (detalle) => detalle.conductor)
+  detalles: DetalleConductore[];
+
   // Hook antes de insertar para calcular la fecha de vencimiento
   @BeforeInsert()
   setFechaHasta() {
@@ -83,8 +89,19 @@ export class Conductore {
     );
   }
 
+  // Hook antes de actualizar para recalcular la fecha de vencimiento
+  @BeforeUpdate()
+  updateFechaHasta() {
+    if (this.fecha_desde) {
+      // Solo recalcular si fecha_desde ha cambiado
+      this.fecha_hasta = this.calculateFechaHasta(
+        this.categoria,
+        this.fecha_desde,
+      );
+    }
+  }
   // Método para calcular la fecha de vencimiento de la licencia
-  private calculateFechaHasta(
+  public calculateFechaHasta(
     categoria: CategoriaLicencia,
     fechaDesde: Date,
   ): Date {

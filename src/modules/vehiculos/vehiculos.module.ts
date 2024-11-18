@@ -26,5 +26,6 @@ import { Vehiculo } from './entities/vehiculo.entity';
   ],
   controllers: [VehiculosController],
   providers: [VehiculosService],
+  exports: [TypeOrmModule],
 })
 export class VehiculosModule {}

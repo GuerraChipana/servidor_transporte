@@ -9,6 +9,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
   UseGuards,
+  BadRequestException,
+  Put,
 } from '@nestjs/common';
 import { ConductoresService } from './conductores.service';
 import { CreateConductoreDto } from './dto/create-conductore.dto';
@@ -28,8 +30,12 @@ import { Rol } from '../user_sistemas/entities/user_sistema.entity';
 export class ConductoresController {
   constructor(private readonly conductoresService: ConductoresService) {}
 
-  // Endpoint para crear
+  // Endpoint para crear conductor
   @ApiResponse({ status: 201, description: 'Conductor creado con éxito' })
+  @ApiResponse({
+    status: 400,
+    description: 'Error en la solicitud. Datos incorrectos.',
+  })
   @ApiResponse({ status: 500, description: 'Error al crear el conductor' })
   @Roles(Rol.ADMINISTRADOR, Rol.SUPERADMINISTRADOR)
   @Post()
@@ -37,15 +43,22 @@ export class ConductoresController {
     @Body() createConductoreDto: CreateConductoreDto,
     @Request() req: UserRequestRequest,
   ) {
-    const userId = req.user.id;
+    const userId = req.user.id; // Obtener el ID del usuario autenticado
+
     try {
+      // Llamar al servicio para crear el conductor
       return await this.conductoresService.create(createConductoreDto, userId);
     } catch (error) {
-      throw new InternalServerErrorException(`${error.message}`);
+      // Manejo de excepciones específicas
+      if (error instanceof BadRequestException) {
+        throw error; // Si es un error de mala solicitud, lo lanzamos directamente
+      }
+      // Otros errores internos
+      throw new InternalServerErrorException(
+        `Error al crear el conductor: ${error.message}`,
+      );
     }
   }
-
-  // Endpoints para editar
   @Roles(Rol.ADMINISTRADOR, Rol.SUPERADMINISTRADOR)
   @Patch('edit/:id')
   async update(
@@ -61,7 +74,16 @@ export class ConductoresController {
         userId,
       );
     } catch (error) {
-      throw new NotFoundException(`${error.message}`);
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(`${error.message}`);
+      }
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(`${error.message}`);
+      }
+      // Otros errores internos pueden ser manejados aquí
+      throw new InternalServerErrorException(
+        `Error inesperado en el servidor ${error.message}`,
+      );
     }
   }
 
@@ -123,6 +145,38 @@ export class ConductoresController {
       return conductor;
     } catch (error) {
       throw new NotFoundException(`${error.mesage}`);
+    }
+  }
+
+  // Endpoint para asociar vehículos a un conductor
+  @Roles(Rol.ADMINISTRADOR, Rol.SUPERADMINISTRADOR)
+  @ApiResponse({ status: 200, description: 'Vehículos asociados con éxito' })
+  @Patch('asociarVehiculo/:id')
+  async asociarVehiculos(
+    @Param('id') id: number,
+    @Body() body: { vehiculos: number[] },
+  ) {
+    try {
+      // Extraer el array de vehiculos del body
+      const vehiculosIds = body.vehiculos;
+
+      // Llamar al servicio para asociar los vehículos al conductor
+      return await this.conductoresService.asociarVehiculosConductor(
+        id, // ID del conductor
+        vehiculosIds, // Array de IDs de vehículos
+      );
+    } catch (error) {
+      // Manejo específico de excepciones
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message); // Devolver error 404 si el recurso no fue encontrado
+      }
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.message); // Devolver error 400 si la solicitud es incorrecta
+      }
+      // Si ocurre cualquier otro tipo de error, devolver error interno 500
+      throw new InternalServerErrorException(
+        `Error al asociar vehículos al conductor: ${error.message || error}`,
+      );
     }
   }
 }

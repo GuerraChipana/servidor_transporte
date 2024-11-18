@@ -11,6 +11,7 @@ import { AsociacionesModule } from './modules/asociaciones/asociaciones.module';
 import { AseguradorasModule } from './modules/aseguradoras/aseguradoras.module';
 import { ConductoresModule } from './modules/conductores/conductores.module';
 import { VehiculosModule } from './modules/vehiculos/vehiculos.module';
+import { DetalleConductoresModule } from './modules/detalle_conductores/detalle_conductores.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { VehiculosModule } from './modules/vehiculos/vehiculos.module';
     AseguradorasModule,
     ConductoresModule,
     VehiculosModule,
+    DetalleConductoresModule,
   ],
   controllers: [],
   providers: [],
