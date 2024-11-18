@@ -7,10 +7,18 @@ import { Persona } from '../personas/entities/persona.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Conductore } from './entities/conductore.entity';
+import { DetalleConductore } from '../detalle_conductores/entities/detalle_conductore.entity';
+import { VehiculosModule } from '../vehiculos/vehiculos.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Conductore, UserSistema, Persona]),
+    TypeOrmModule.forFeature([
+      Conductore,
+      UserSistema,
+      Persona,
+      DetalleConductore,
+    ]),
+    VehiculosModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

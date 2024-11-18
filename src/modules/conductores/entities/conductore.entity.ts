@@ -7,8 +7,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BeforeInsert,
+  OneToMany,
 } from 'typeorm';
 import { Persona } from 'src/modules/personas/entities/persona.entity';
+import { DetalleConductore } from 'src/modules/detalle_conductores/entities/detalle_conductore.entity';
 
 export enum CategoriaLicencia {
   'B-I' = 'B-I',
@@ -27,7 +29,7 @@ export class Conductore {
   @JoinColumn({ name: 'id_persona' })
   id_persona: Persona;
 
-  @Column({ type: 'varchar', length: 25 })
+  @Column({ type: 'varchar', length: 25, unique: true })
   n_licencia: string;
 
   @Column({ type: 'date' })
@@ -74,6 +76,9 @@ export class Conductore {
   })
   fecha_modificacion: Date;
 
+  @OneToMany(() => DetalleConductore, (detalle) => detalle.conductor)
+  detalles: DetalleConductore[];
+
   // Hook antes de insertar para calcular la fecha de vencimiento
   @BeforeInsert()
   setFechaHasta() {
@@ -84,7 +89,7 @@ export class Conductore {
   }
 
   // Método para calcular la fecha de vencimiento de la licencia
-  private calculateFechaHasta(
+  public calculateFechaHasta(
     categoria: CategoriaLicencia,
     fechaDesde: Date,
   ): Date {

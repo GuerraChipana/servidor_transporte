@@ -7,6 +7,7 @@ import {
   IsIn,
   Length,
   Matches,
+  IsArray,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
@@ -65,7 +66,7 @@ export class CreateConductoreDto {
     message: 'La fecha debe estar en el formato válido: YYYY-MM-DD.',
   })
   fecha_desde: string;
-  
+
   @ApiProperty({
     description: 'Restricciones asociadas a la licencia (opcional)',
     type: String,
@@ -98,4 +99,16 @@ export class CreateConductoreDto {
       'El grupo sanguíneo debe ser un formato válido (Ejemplo: O+, A-, B+, AB-).',
   })
   g_sangre: string;
+
+  @ApiProperty({
+    description: 'Lista de identificadores de vehículos asociados al conductor',
+    type: [Number],
+    isArray: true,
+    required: false,
+    example: [11, 2, 4],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsNotEmpty({ each: true, message: 'Cada ID de vehículo debe ser un número válido.' })
+  vehiculos?: number[];
 }

@@ -6,8 +6,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Persona } from 'src/modules/personas/entities/persona.entity';
+import { DetalleConductore } from 'src/modules/detalle_conductores/entities/detalle_conductore.entity';
 
 @Entity('vehiculos')
 export class Vehiculo {
@@ -32,7 +34,7 @@ export class Vehiculo {
   @Column({ type: 'varchar', length: 20 })
   color: string;
 
-  @Column({ type: 'year' , name:'ano_de_compra'})
+  @Column({ type: 'year', name: 'ano_de_compra' })
   ano_de_compra: number;
 
   // Relaciones con la entidad Persona para los propietarios
@@ -65,4 +67,7 @@ export class Vehiculo {
 
   @UpdateDateColumn()
   fecha_modificacion: Date;
+
+  @OneToMany(() => DetalleConductore, (detalle) => detalle.vehiculo)
+  detalles: DetalleConductore[];
 }
