@@ -112,7 +112,7 @@ export class VehiculoSegurosService {
       n_poliza: createVehiculoSeguroDto.n_poliza,
       fecha_vigencia_desde: createVehiculoSeguroDto.fecha_vigencia_desde,
       fecha_vigencia_hasta: createVehiculoSeguroDto.fecha_vigencia_hasta,
-      id_usuario,
+      id_usuario:id_usuario,
       estado_vencimiento: this.actualizarEstadoVencimiento(
         createVehiculoSeguroDto.fecha_vigencia_hasta,
       ),

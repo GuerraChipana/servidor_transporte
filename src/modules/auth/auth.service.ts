@@ -19,6 +19,7 @@ export class AuthService {
     const user = await this.validateUser(loginDto.username, loginDto.password); // Valida las credenciales del usuario
     const payload = {
       id: user.id_user,
+      usuario: user.username,
       rol: user.rol,
       nombre: user.nombre,
     };

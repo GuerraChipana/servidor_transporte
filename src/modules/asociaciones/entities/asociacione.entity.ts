@@ -2,11 +2,10 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-//import { Tuc } from './tuc.entity';
+import { Tuc } from 'src/modules/tuc/entities/tuc.entity';
 
 @Entity('asociaciones')
 export class Asociacione {
@@ -37,7 +36,6 @@ export class Asociacione {
   @UpdateDateColumn({ type: 'timestamp' })
   fecha_modificacion: Date;
 
-  // Relación con la tabla tuc
-  // @OneToMany(() => Tuc, tuc => tuc.asociacion)
-  // tucs: Tuc[];
+  @OneToMany(() => Tuc, (tuc) => tuc.id_asociacion)
+  tuc: Tuc[];
 }
