@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Persona } from 'src/modules/personas/entities/persona.entity';
 import { DetalleConductore } from 'src/modules/detalle_conductores/entities/detalle_conductore.entity';
+import { VehiculoSeguro } from 'src/modules/vehiculo-seguros/entities/vehiculo-seguro.entity';
 
 @Entity('vehiculos')
 export class Vehiculo {
@@ -70,4 +71,10 @@ export class Vehiculo {
 
   @OneToMany(() => DetalleConductore, (detalle) => detalle.vehiculo)
   detalles: DetalleConductore[];
+
+  @OneToMany(
+    () => VehiculoSeguro,
+    (vehiculoSeguro) => vehiculoSeguro.id_vehiculo,
+  )
+  vehiculosSeguros: VehiculoSeguro[];
 }

@@ -17,7 +17,7 @@ import { CreateConductoreDto } from './dto/create-conductore.dto';
 import { UpdateConductoreDto } from './dto/update-conductore.dto';
 import { UserRequestRequest } from '../user-request.Request';
 import { CambioEstadoConducotoreDto } from './dto/cambioestado-conductore.dto';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt.auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -36,6 +36,9 @@ export class ConductoresController {
     status: 400,
     description: 'Error en la solicitud. Datos incorrectos.',
   })
+  @ApiOperation({
+    summary: 'Crear un conducotr, asociarlo con vehiculos ( opcional )',
+  })
   @ApiResponse({ status: 500, description: 'Error al crear el conductor' })
   @Roles(Rol.ADMINISTRADOR, Rol.SUPERADMINISTRADOR)
   @Post()
@@ -43,23 +46,20 @@ export class ConductoresController {
     @Body() createConductoreDto: CreateConductoreDto,
     @Request() req: UserRequestRequest,
   ) {
-    const userId = req.user.id; // Obtener el ID del usuario autenticado
-
+    const userId = req.user.id;
     try {
-      // Llamar al servicio para crear el conductor
       return await this.conductoresService.create(createConductoreDto, userId);
     } catch (error) {
-      // Manejo de excepciones específicas
       if (error instanceof BadRequestException) {
-        throw error; // Si es un error de mala solicitud, lo lanzamos directamente
+        throw error;
       }
-      // Otros errores internos
       throw new InternalServerErrorException(
         `Error al crear el conductor: ${error.message}`,
       );
     }
   }
   @Roles(Rol.ADMINISTRADOR, Rol.SUPERADMINISTRADOR)
+  @ApiOperation({ summary: 'Actualizar datos del conductor' })
   @Patch('edit/:id')
   async update(
     @Param('id') id: number,
@@ -90,6 +90,7 @@ export class ConductoresController {
   // Endpoints para cambiar de estado
   @Roles(Rol.ADMINISTRADOR, Rol.SUPERADMINISTRADOR)
   @ApiResponse({ status: 202, description: 'El estado a sido cambiado' })
+  @ApiOperation({ summary: 'Cambiar el estado de un conductor' })
   @Patch('estado/:id')
   async estado(
     @Param('id') id: number,
@@ -118,6 +119,7 @@ export class ConductoresController {
     Rol.SUPERADMINISTRADOR,
   )
   @ApiResponse({ status: 200, description: 'Listado de conductores completo' })
+  @ApiOperation({ summary: 'Listar todos los conductores' })
   @Get()
   async findAll() {
     try {
@@ -138,6 +140,7 @@ export class ConductoresController {
     Rol.ADMINISTRADOR,
     Rol.SUPERADMINISTRADOR,
   )
+  @ApiOperation({ summary: 'Buscar conductor por Id' })
   @Get(':id')
   async findOne(@Param('id') id: number) {
     try {
@@ -151,6 +154,7 @@ export class ConductoresController {
   // Endpoint para asociar vehículos a un conductor
   @Roles(Rol.ADMINISTRADOR, Rol.SUPERADMINISTRADOR)
   @ApiResponse({ status: 200, description: 'Vehículos asociados con éxito' })
+  @ApiOperation({ summary: 'Actualizar un conductor con vehiculos' })
   @Patch('asociarVehiculo/:id')
   async asociarVehiculos(
     @Param('id') id: number,

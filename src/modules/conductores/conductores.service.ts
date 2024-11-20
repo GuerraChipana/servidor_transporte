@@ -15,26 +15,6 @@ import { Vehiculo } from 'src/modules/vehiculos/entities/vehiculo.entity';
 import { CambioEstadoConducotoreDto } from './dto/cambioestado-conductore.dto';
 import { UpdateConductoreDto } from './dto/update-conductore.dto';
 
-export interface ConductorConPersona {
-  id: number;
-  id_persona: {
-    id: number;
-    nombre: string;
-    apellidos: string;
-    foto: string;
-  };
-  n_licencia: string;
-  fecha_desde: Date;
-  fecha_hasta: Date;
-  clase: string;
-  categoria: CategoriaLicencia;
-  g_sangre: string;
-  estado: number;
-  id_usuario: number;
-  id_usuario_modificacion: number;
-  fecha_registro: Date;
-  fecha_modificacion: Date;
-}
 @Injectable()
 export class ConductoresService {
   constructor(
@@ -145,7 +125,7 @@ export class ConductoresService {
       id_persona: {
         id: conductorConVehiculos.id_persona.id,
         nombre: conductorConVehiculos.id_persona.nombre,
-        apellidos: `${conductorConVehiculos.id_persona.apPaterno}+${conductorConVehiculos.id_persona.apMaterno.charAt(0)}`,
+        apellidos: `${conductorConVehiculos.id_persona.apPaterno} ${conductorConVehiculos.id_persona.apMaterno.charAt(0)}.`,
         foto: conductorConVehiculos.id_persona.foto,
       },
       vehiculos: conductorConVehiculos.detalles.map((detalle) => ({
@@ -296,59 +276,90 @@ export class ConductoresService {
     return await this.conductoreRepositorio.save(conduc);
   }
 
-  // Servicio para listar todo
-  async findAll(): Promise<ConductorConPersona[]> {
-    const conductores = await this.conductoreRepositorio.find({
-      relations: ['id_persona'],
-      select: {
-        id_persona: {
-          nombre: true,
-          apPaterno: true,
-          apMaterno: true,
-          foto: true,
-        },
-      },
-    });
+  // Método para listar todos los conductores
+  async findAll(): Promise<any[]> {
+    try {
+      const conductores = await this.conductoreRepositorio.find({
+        relations: ['detalles', 'detalles.vehiculo', 'id_persona'],
+      });
 
-    return conductores.map((conductor) => {
-      return {
-        ...conductor,
-        id_persona: {
+      return conductores.map((conductor) => {
+        return {
           id: conductor.id,
+          n_licencia: conductor.n_licencia,
+          fecha_desde: conductor.fecha_desde,
+          fecha_hasta: conductor.fecha_hasta,
+          clase: conductor.clase,
+          categoria: conductor.categoria,
+          restriccion: conductor.restriccion,
+          g_sangre: conductor.g_sangre,
+          estado: conductor.estado,
+          detalle_baja: conductor.detalle_baja,
+          id_usuario: conductor.id_usuario,
+          fecha_registro: conductor.fecha_registro,
+          fecha_modificacion: conductor.fecha_modificacion,
+          id_persona: {
+            id: conductor.id_persona.id,
+            nombre: conductor.id_persona.nombre,
+            apellidos: `${conductor.id_persona.apPaterno} ${conductor.id_persona.apMaterno.charAt(0)}.`,
+            foto: conductor.id_persona.foto,
+          },
+          // Vehículos asociados
+          vehiculos: conductor.detalles.map((detalle) => ({
+            id: detalle.vehiculo.id,
+            placa: detalle.vehiculo.placa,
+          })),
+        };
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Error al obtener los conductores.',
+      );
+    }
+  }
+
+  // Método para obtener un conductor por ID
+  async findOne(id: number): Promise<any> {
+    try {
+      const conductor = await this.conductoreRepositorio.findOne({
+        where: { id },
+        relations: ['detalles', 'detalles.vehiculo', 'id_persona'], // Cargar detalles, vehículos y persona
+      });
+
+      if (!conductor) {
+        throw new NotFoundException(`Conductor con ID ${id} no encontrado.`);
+      }
+
+      // Filtrar solo los campos necesarios para la respuesta
+      return {
+        id: conductor.id,
+        n_licencia: conductor.n_licencia,
+        fecha_desde: conductor.fecha_desde,
+        fecha_hasta: conductor.fecha_hasta,
+        clase: conductor.clase,
+        categoria: conductor.categoria,
+        restriccion: conductor.restriccion,
+        g_sangre: conductor.g_sangre,
+        estado: conductor.estado,
+        detalle_baja: conductor.detalle_baja,
+        id_usuario: conductor.id_usuario,
+        fecha_registro: conductor.fecha_registro,
+        fecha_modificacion: conductor.fecha_modificacion,
+        id_persona: {
+          id: conductor.id_persona.id,
           nombre: conductor.id_persona.nombre,
           apellidos: `${conductor.id_persona.apPaterno} ${conductor.id_persona.apMaterno.charAt(0)}.`,
           foto: conductor.id_persona.foto,
         },
+        // Vehículos asociados
+        vehiculos: conductor.detalles.map((detalle) => ({
+          id: detalle.vehiculo.id,
+          placa: detalle.vehiculo.placa,
+        })),
       };
-    });
-  }
-
-  async findOne(id: number): Promise<ConductorConPersona> {
-    const conductor = await this.conductoreRepositorio.findOne({
-      where: { id },
-      relations: ['id_persona'],
-      select: {
-        id_persona: {
-          nombre: true,
-          apPaterno: true,
-          apMaterno: true,
-          foto: true,
-        },
-      },
-    });
-
-    if (!conductor)
-      throw new NotFoundException(`El ID ${id} del conductor no encontrado`);
-
-    return {
-      ...conductor,
-      id_persona: {
-        id: conductor.id,
-        nombre: conductor.id_persona.nombre,
-        apellidos: `${conductor.id_persona.apPaterno} ${conductor.id_persona.apMaterno.charAt(0)}.`, // Solo la inicial del apellido materno
-        foto: conductor.id_persona.foto,
-      },
-    };
+    } catch (error) {
+      throw new InternalServerErrorException('Error al obtener el conductor.');
+    }
   }
 
   async estado(

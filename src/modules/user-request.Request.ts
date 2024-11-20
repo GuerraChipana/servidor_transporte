@@ -1,7 +1,7 @@
 export interface UserRequestRequest extends Request {
   user: {
     id: number;
-    username: string;
+    nombre: string;
     rol: string;
   };
 }
