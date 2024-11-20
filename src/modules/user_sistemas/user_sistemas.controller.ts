@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { UserSistemasService } from './user_sistemas.service';
 import { CreateUserSistemaDto } from './dto/create-user_sistema.dto';
-import { ApiTags, ApiBody, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiBody, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt.auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -29,14 +29,14 @@ interface UserRequest extends Request {
     rol: string;
   };
 }
-
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('Endpoints de Usuarios de Sistemas')
 @Controller('users')
 export class UserSistemasController {
   constructor(private readonly userSistemasService: UserSistemasService) {}
 
   // Endpoints para crear un nuevo usuario:
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiOperation({ summary: 'Registrar un nuevo usuario al sistema' })
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @HttpCode(201)
   @Post('registrar')
@@ -63,7 +63,7 @@ export class UserSistemasController {
   }
 
   // Endpoints para listado de todos los usuarios:
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiOperation({ summary: 'Listar todos los usuarios del sistema' })
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @Get('listar')
   @ApiResponse({ status: 200, description: 'Listado de usuarios con exito' })
@@ -82,7 +82,7 @@ export class UserSistemasController {
   }
 
   // Endpoints para listar por id:
-  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Buscar un usuario del sistema por su Id' })
   @Get(':id')
   @ApiResponse({ status: 511, description: 'Token requerido' })
   @ApiResponse({ status: 200, description: 'Usuario encontrado' })
@@ -96,7 +96,7 @@ export class UserSistemasController {
   }
 
   // Endpoints para cambiar de Rol a un usuario
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiOperation({ summary: 'Cambiar de rol a un usuario' })
   @Roles(Rol.SUPERADMINISTRADOR)
   @Patch('rol/:id')
   @ApiResponse({
@@ -130,7 +130,13 @@ export class UserSistemasController {
   }
 
   // Endpoints para cambiar tus mismas credenciales
-  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Cambiar tus propios datos' })
+  @Roles(
+    Rol.MODERADOR,
+    Rol.ASISTENTE,
+    Rol.ADMINISTRADOR,
+    Rol.SUPERADMINISTRADOR,
+  )
   @Patch('cambio-credencial')
   @ApiResponse({
     status: 200,
@@ -153,7 +159,7 @@ export class UserSistemasController {
   }
 
   // Endpoints para cambiar de estado a un usuario
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiOperation({ summary: 'Cambior estado a un usuario' })
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @ApiResponse({
     status: 404,

@@ -1,6 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn } from 'typeorm';
-// import { VehiculoSeguros } from './vehiculo-seguro.entity';
-
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
+import { VehiculoSeguro } from 'src/modules/vehiculo-seguros/entities/vehiculo-seguro.entity';
 @Entity('aseguradoras')
 export class Aseguradora {
   @PrimaryGeneratedColumn({ name: 'id_aseg' })
@@ -27,7 +32,6 @@ export class Aseguradora {
   @UpdateDateColumn({ type: 'datetime' })
   fecha_modificacion: Date;
 
-  //   // Relación inversa (si un vehículo puede tener múltiples seguros, es una relación uno a muchos)
-  //   @OneToMany(() => VehiculoSeguros, vehiculoSeguro => vehiculoSeguro.aseguradora)
-  //   vehiculoSeguros: VehiculoSeguros[];
+  @OneToMany(() => VehiculoSeguro, (vehiculoSeg) => vehiculoSeg.id_aseguradora)
+  vehiculosSeguros: VehiculoSeguro[];
 }
