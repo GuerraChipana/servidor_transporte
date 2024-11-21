@@ -82,7 +82,6 @@ export class PersonaService {
       );
     }
 
-
     const fullImageUrl = imageUrl;
 
     // Validar si el DNI ya existe
@@ -156,9 +155,26 @@ export class PersonaService {
           return RestoDatos; // Todo los campos menos los excluidos
         case 'moderador':
         case 'asistente':
-          const { id,dni, nombre, apPaterno, apMaterno, telefono, foto, email } =
-            persona;
-          return { id,dni, nombre, apPaterno, apMaterno, telefono, foto, email };
+          const {
+            id,
+            dni,
+            nombre,
+            apPaterno,
+            apMaterno,
+            telefono,
+            foto,
+            email,
+          } = persona;
+          return {
+            id,
+            dni,
+            nombre,
+            apPaterno,
+            apMaterno,
+            telefono,
+            foto,
+            email,
+          };
         default:
           return {};
       }
@@ -211,10 +227,12 @@ export class PersonaService {
     updatePersonaDto: UpdatePersonaDto,
     id_usuario_modificacion: number,
   ): Promise<Persona> {
-    const persona = await this.personaRepository.findOne({ where: { id } });
+    const persona = await this.personaRepository.findOne({
+      where: { id, estado: 1 },
+    });
 
     if (!persona) {
-      throw new NotFoundException('Persona no encontrada');
+      throw new NotFoundException('Persona no se encuentra activa');
     }
 
     // Validar que el email no se repita si se proporciona
@@ -253,17 +271,14 @@ export class PersonaService {
 
   private handleApiError(error: any) {
     if (error.response) {
-      console.error('Error en la API:', error.response.data);
       throw new InternalServerErrorException(
         `Error en la API: ${JSON.stringify(error.response.data)}`,
       );
     } else if (error.request) {
-      console.error('No se recibió respuesta de la API:', error.request);
       throw new InternalServerErrorException(
         'No se recibió respuesta de la API',
       );
     } else {
-      console.error('Error al configurar la solicitud:', error.message);
       throw new InternalServerErrorException(
         `Error al configurar la solicitud: ${error.message}`,
       );

@@ -18,7 +18,7 @@ import { UserRequestRequest } from '../user-request.Request';
 import { JwtAuthGuard } from '../auth/jwt.auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { EstadoDtoTuc } from './dto/estado-tuc.dto';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../auth/roles.decorator';
 import { Rol } from '../user_sistemas/entities/user_sistema.entity';
 
@@ -32,7 +32,6 @@ export class TucController {
 
   @ApiOperation({ summary: 'Registrar un nuevo usuario al sistema' })
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
-  @ApiBody({ type: CreateTucDto })
   @ApiResponse({ status: 201, description: 'Tuc registrado con éxito.' })
   @ApiResponse({ status: 500, description: 'Error al crear el TUC.' })
   @Post()
@@ -96,12 +95,7 @@ export class TucController {
     return await this.tucService.update(id, updateTucDto, userId);
   }
 
-  @Roles(
-    Rol.MODERADOR,
-    Rol.ASISTENTE,
-    Rol.ADMINISTRADOR,
-    Rol.SUPERADMINISTRADOR,
-  )
+  @Roles(Rol.ADMINISTRADOR, Rol.SUPERADMINISTRADOR)
   @ApiResponse({ status: 200, description: 'Estado cambio exitoso' })
   @ApiOperation({ summary: 'Cambiar estado de un Tuc' })
   @Patch('estado/:id')

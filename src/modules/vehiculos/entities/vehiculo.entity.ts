@@ -12,6 +12,7 @@ import { Persona } from 'src/modules/personas/entities/persona.entity';
 import { DetalleConductore } from 'src/modules/detalle_conductores/entities/detalle_conductore.entity';
 import { VehiculoSeguro } from 'src/modules/vehiculo-seguros/entities/vehiculo-seguro.entity';
 import { Tuc } from 'src/modules/tuc/entities/tuc.entity';
+import { Empadronamiento } from 'src/modules/empadronamiento/entities/empadronamiento.entity';
 
 @Entity('vehiculos')
 export class Vehiculo {
@@ -81,4 +82,10 @@ export class Vehiculo {
 
   @OneToMany(() => Tuc, (Tuc) => Tuc.id_vehiculo)
   Tucs: Tuc[];
+
+  @OneToMany(
+    () => Empadronamiento,
+    (empadronamiento) => empadronamiento.id_vehiculo,
+  )
+  EmpadronamientoVehiculo: Empadronamiento[];
 }

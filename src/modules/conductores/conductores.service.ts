@@ -264,9 +264,13 @@ export class ConductoresService {
     updateConductoreDto: UpdateConductoreDto,
     id_usuario_modificacion: number,
   ): Promise<Conductore> {
-    const conduc = await this.conductoreRepositorio.findOne({ where: { id } });
+    const conduc = await this.conductoreRepositorio.findOne({
+      where: { id, estado: 1 },
+    });
     if (!conduc)
-      throw new NotFoundException(`Conductor con ID ${id} no encontrado`);
+      throw new NotFoundException(
+        `Conductor con ID ${id} no se encuentra activo`,
+      );
     await this.validarLicencia(updateConductoreDto, id);
     conduc.id_usuario_modificacion = id_usuario_modificacion;
 

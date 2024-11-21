@@ -150,11 +150,11 @@ export class VehiculoSegurosService {
     id_usuario_modificacion: number,
   ): Promise<VehiculoSeguro> {
     const vehiculoSeguro = await this.vehiculoSeguroRepositorio.findOne({
-      where: { id_vehseg: id },
+      where: { id_vehseg: id, estado: 1 },
       relations: ['id_aseguradora', 'id_vehiculo'],
     });
     if (!vehiculoSeguro) {
-      throw new NotFoundException(`Seguro con ID ${id} no encontrado`);
+      throw new NotFoundException(`Seguro con ID ${id} inactivo`);
     }
 
     await this.Validaciones(updateVehiculoSeguroDto, id);

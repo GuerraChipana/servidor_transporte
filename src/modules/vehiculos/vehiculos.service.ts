@@ -155,11 +155,13 @@ export class VehiculosService {
   ): Promise<Vehiculo> {
     // Recuperar el vehículo actual de la base de datos con las relaciones de propietario
     const vehiculo = await this.vehiculoRepository.findOne({
-      where: { id },
+      where: { id, estado: 1 },
       relations: ['propietario1', 'propietario2'],
     });
     if (!vehiculo) {
-      throw new BadRequestException('Vehículo no encontrado');
+      throw new BadRequestException(
+        `El vehiculo con ID ${id} no se encuentra activo`,
+      );
     }
 
     // Verificar si los propietarios existen en la base de datos y asignarlos correctamente
@@ -194,7 +196,6 @@ export class VehiculosService {
     let imagenURL: string | undefined;
 
     if (file) {
-      // Si existe un archivo, gestionamos la imagen
       try {
         // Eliminar la imagen anterior si existe
         if (vehiculo.imagen_url) {
@@ -208,7 +209,6 @@ export class VehiculosService {
         }
 
         imagenURL = await this.imagenesService.subirFileNormal(
-          // Subir la nueva imagen con el nombre de la placa actual
           file,
           `vehiculo_${vehiculo.placa}`, // Usamos la placa actual para el nombre de la imagen
           'vehiculos', // carpeta 'vehiculos' dentro de 'imagenes'
