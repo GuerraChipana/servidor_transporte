@@ -108,11 +108,11 @@ export class TucService {
     id_usuario_modificacion: number,
   ): Promise<Tuc> {
     const modiTuc = await this.tucRepositorio.findOne({
-      where: { id_tuc: id },
+      where: { id_tuc: id, estado: 1 },
       relations: ['id_asociacion', 'id_vehiculo'],
     });
-    if (!modiTuc)
-      throw new NotFoundException(`EL TUC con ID ${id} no se encuentra`);
+    if (modiTuc)
+      throw new NotFoundException(`EL TUC con ID ${id} esta inactivo`);
     await this.validaciones(updatetucdto, id);
     modiTuc.id_usuario_modificacion = id_usuario_modificacion;
 

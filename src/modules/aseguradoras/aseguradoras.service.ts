@@ -54,8 +54,10 @@ export class AseguradorasService {
     updateAseguradoraDto: UpdateAseguradoraDto,
     id_usuario_modificacion: number,
   ): Promise<Aseguradora> {
-    const asegu = await this.aseguradoraRepository.findOne({ where: { id } });
-    if (!asegu) throw new NotFoundException('Asegurada no encontrada');
+    const asegu = await this.aseguradoraRepository.findOne({
+      where: { id, estado: 1 },
+    });
+    if (!asegu) throw new NotFoundException('Asegurada no se encuentra activa');
     await this.Validacion(updateAseguradoraDto, id);
     asegu.id_usuario_modificacion = id_usuario_modificacion;
     Object.assign(asegu, updateAseguradoraDto);
