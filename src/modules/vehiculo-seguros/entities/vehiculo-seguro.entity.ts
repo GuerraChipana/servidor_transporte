@@ -6,8 +6,6 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  BeforeInsert,
-  BeforeUpdate,
 } from 'typeorm';
 import { Vehiculo } from 'src/modules/vehiculos/entities/vehiculo.entity';
 import { Aseguradora } from 'src/modules/aseguradoras/entities/aseguradora.entity';
