@@ -41,15 +41,11 @@ export class Vehiculo {
   ano_de_compra: number;
 
   // Relaciones con la entidad Persona para los propietarios
-  @ManyToOne(() => Persona, (persona) => persona.vehiculosPropietario1, {
-    nullable: false,
-  })
+  @ManyToOne(() => Persona, (persona) => persona.vehiculosPropietario1)
   @JoinColumn({ name: 'propietario_1_id' })
   propietario1: Persona; // Propietario 1
 
-  @ManyToOne(() => Persona, (persona) => persona.vehiculosPropietario2, {
-    nullable: true,
-  })
+  @ManyToOne(() => Persona, (persona) => persona.vehiculosPropietario2)
   @JoinColumn({ name: 'propietario_2_id' })
   propietario2: Persona; // Propietario 2
 

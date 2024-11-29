@@ -3,14 +3,17 @@ import {
   IsString,
   IsOptional,
   IsEmail,
-  Length,
+  IsPhoneNumber,
   Matches,
+  Length,
+  IsAlphanumeric,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePersonaDto {
   @ApiProperty({
-    description: 'DNI del usuario, debe contener exactamente 8 dígitos numéricos',
+    description:
+      'DNI del usuario, debe contener exactamente 8 dígitos numéricos',
     pattern: '^[0-9]{8}$',
   })
   @IsString({ message: 'El DNI debe ser una cadena de texto' })
@@ -24,11 +27,11 @@ export class CreatePersonaDto {
   @ApiProperty({
     description:
       'Teléfono de la persona (opcional), debe contener de 9 a 11 dígitos',
+    example: '+51987654321',
   })
   @IsOptional()
-  @Matches(/^(?:\+51)?9\d{8}$/, {
-    message:
-      'El teléfono debe ser un número de Perú y contener de 9 dígitos',
+  @IsPhoneNumber('PE', {
+    message: 'El teléfono debe ser un número válido de Perú',
   })
   telefono?: string;
 
@@ -36,6 +39,7 @@ export class CreatePersonaDto {
     description: 'Correo electrónico del usuario (opcional)',
     minLength: 8,
     maxLength: 100,
+    example: 'usuario@example.com',
   })
   @IsOptional()
   @IsEmail({}, { message: 'El correo electrónico debe ser válido' })
@@ -44,4 +48,11 @@ export class CreatePersonaDto {
     message: 'El correo electrónico debe tener entre 8 y 100 caracteres',
   })
   email?: string;
+
+  @ApiProperty({
+    description: 'Contraseña del usuario de consulta',
+  })
+  @IsString()
+  @IsNotEmpty({ message: 'La contraseña no puede estar vacía' })
+  password_consulta: string;
 }

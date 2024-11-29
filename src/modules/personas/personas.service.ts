@@ -16,6 +16,7 @@ import { AxiosResponse } from 'axios';
 import { DatosPersona } from './datos-persona.interface';
 import { UpdatePersonaDto } from './dto/update-persona.dto';
 import { CambioEstadoPersonaDto } from './dto/estado-persona.dto';
+import { CreatePersonaDto } from './dto/create-persona.dto';
 
 @Injectable()
 export class PersonaService {
@@ -32,19 +33,19 @@ export class PersonaService {
 
   // Servicio para crear Persona //
   async create(
-    dni: string,
+    createPersonaDto: CreatePersonaDto,
     id_user: number,
-    telefono?: string,
-    email?: string,
   ): Promise<Persona> {
-    // Verificar que el usuario existe
+  
+    const { dni, telefono, email, password_consulta } = createPersonaDto;
+
     const user = await this.userRepository.findOne({ where: { id_user } });
     if (!user) {
       throw new InternalServerErrorException('Usuario no encontrado');
     }
 
     // Llamada a la API
-    const apiUrl = `${process.env.RENIEC_API}?nuDniConsulta=${dni}&nuDniUsuario=${process.env.RENIEC_USER}&nuRucUsuario=${process.env.RENIEC_RUC}&password=${process.env.RENIEC_PASSWORD}&out=json`;
+    const apiUrl = `${process.env.RENIEC_API}?nuDniConsulta=${dni}&nuDniUsuario=${user.dni}&nuRucUsuario=${process.env.RENIEC_RUC}&password=${password_consulta}&out=json`;
     console.log('URL de la API:', apiUrl);
 
     let personaData: DatosPersona;

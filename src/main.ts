@@ -25,6 +25,7 @@ async function bootstrap() {
     .addTag('Endpoints de Conductores')
     .addTag('Endpoints de Aseguradoras')
     .addTag('Endpoints de Asociaciones')
+    .addTag('Endpoints de Empadronamiento')
     .build();
 
   // Generación de la documentación

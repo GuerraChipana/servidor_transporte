@@ -3,6 +3,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -103,25 +104,37 @@ export class UserSistemasService {
   async CambiarRol(
     id_user: number,
     cambiarRolUserDto: CambiarRolUserDto,
-    rol: string,
-    id_usuario_modificacion: number,
+    rol: string, // Rol del usuario que está realizando la acción
+    id_usuario_modificacion: number, // ID del usuario que realiza la modificación
   ): Promise<UserSistema> {
     try {
-      if (rol !== 'superadministrador') {
-        throw new ForbiddenException(
-          'Solo el Superadministrador puede cambiar los roles',
-        );
+      if (rol === 'superadministrador') {
+        const user = await this.findOne(id_user);
+        Object.assign(user, cambiarRolUserDto);
+        user.id_usuario_modificacion = id_usuario_modificacion;
+
+        return await this.userSistemaRepository.save(user);
       }
-      // Encontramos al usuario por ID
-      const user = await this.findOne(id_user);
-
-      // Asignacion de nuevos roles
-      Object.assign(user, cambiarRolUserDto);
-
-      // Guardar el ID del usuario que realiza la modificación y actualizar la fecha
-      user.id_usuario_modificacion = id_usuario_modificacion;
-      // Lo guarda en la base de datos
-      return await this.userSistemaRepository.save(user);
+      if (rol === 'administrador') {
+        const nuevoRol = cambiarRolUserDto.rol;
+        if (['administrador', 'superadministrador'].includes(nuevoRol)) {
+          throw new ForbiddenException(
+            'No puedes cambiar el rol a otro administrador o superadministrador',
+          );
+        }
+        if (!['asistente', 'moderador'].includes(nuevoRol)) {
+          throw new ForbiddenException(
+            'El administrador solo puede cambiar a rol de asistente o moderador',
+          );
+        }
+        const user = await this.findOne(id_user);
+        Object.assign(user, cambiarRolUserDto);
+        user.id_usuario_modificacion = id_usuario_modificacion;
+        return await this.userSistemaRepository.save(user);
+      }
+      throw new ForbiddenException(
+        'Solo el Superadministrador o Administrador pueden cambiar roles',
+      );
     } catch (error) {
       throw new Error(`Error al cambiar de rol: ${error.message}`);
     }
@@ -192,9 +205,16 @@ export class UserSistemasService {
     id_usuario_modificacion: number,
   ): Promise<UserSistema> {
     // Encontramos al usuario por ID
-    const user = await this.findOne(id_user);
+    const user = await this.userSistemaRepository.findOne({
+      where: { id_user: id_user },
+    });
 
-    // Evitamos que un administrador cambie el estado de otro administrador o superadministrador
+    // Verificar si el usuario existe
+    if (!user) {
+      throw new NotFoundException(`Usuario con ID ${id_user} no encontrado.`);
+    }
+
+    // Si el rol es administrador, no puede cambiar el estado de otro administrador o superadministrador
     if (
       rol === 'administrador' &&
       (user.rol === 'administrador' || user.rol === 'superadministrador')
@@ -204,12 +224,25 @@ export class UserSistemasService {
       );
     }
 
+    // Si el rol es superadministrador, puede cambiar el estado de cualquier usuario
+    if (rol === 'superadministrador') {
+      // No necesitas hacer ninguna validación adicional aquí, ya que un superadministrador puede cambiar a cualquier usuario
+    } else if (rol !== 'administrador') {
+      // Maneja otros roles si es necesario
+      throw new ForbiddenException(
+        'Rol no autorizado para cambiar el estado del usuario',
+      );
+    }
+
     // Cambiamos el estado del usuario
     user.estado = cambioEstadoUserDto.estado;
 
     // Validamos detalle_baja si el estado es inactivo
     if (cambioEstadoUserDto.estado === 0) {
-      if (!cambioEstadoUserDto.detalle_baja) {
+      if (
+        !cambioEstadoUserDto.detalle_baja ||
+        cambioEstadoUserDto.detalle_baja.trim() === ''
+      ) {
         throw new BadRequestException(
           'Se requiere un detalle de baja cuando el estado es inactivo',
         );
@@ -218,7 +251,15 @@ export class UserSistemasService {
     } else {
       user.detalle_baja = null;
     }
+
     user.id_usuario_modificacion = id_usuario_modificacion;
-    return await this.userSistemaRepository.save(user);
+
+    try {
+      return await this.userSistemaRepository.save(user);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Ocurrió un error al cambiar el estado del usuario',
+      );
+    }
   }
 }

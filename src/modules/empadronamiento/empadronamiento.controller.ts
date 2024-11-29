@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   Request,
   InternalServerErrorException,
   UseGuards,
@@ -17,10 +16,11 @@ import { UserRequestRequest } from '../user-request.Request';
 import { JwtAuthGuard } from '../auth/jwt.auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { EstadoEmpadronamientoDto } from './dto/estado-empadronamiento.dto';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../auth/roles.decorator';
 import { Rol } from '../user_sistemas/entities/user_sistema.entity';
 
+@ApiTags('Endpoints de Empadronamiento')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('empadronamiento')
 export class EmpadronamientoController {

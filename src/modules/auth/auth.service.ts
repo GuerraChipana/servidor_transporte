@@ -59,4 +59,27 @@ export class AuthService {
 
     return user;
   }
+
+  async bievenida(id: number) {
+    const user = await this.userSistemaRepository.findOne({
+      where: { id_user: id },
+      select: { nombre: true, apPaterno: true, rol: true },
+    });
+
+    return user;
+  }
+
+  async cuenta(id: number) {
+    const user = await this.userSistemaRepository.findOne({
+      where: { id_user: id },
+      select: {
+        nombre: true,
+        apPaterno: true,
+        apMaterno: true,
+        email: true,
+        rol: true,
+      },
+    });
+    return user;
+  }
 }

@@ -37,17 +37,15 @@ export class PersonasController {
   @ApiResponse({ status: 201, description: 'Persona creada con éxito.' })
   @ApiResponse({ status: 500, description: 'Error al crear la persona.' })
   async create(
-    @Body() body: CreatePersonaDto,
+    @Body() createPersonaDto: CreatePersonaDto,
     @Request() req: UserRequestRequest,
   ) {
     const userId = req.user.id;
 
     try {
       const persona = await this.personasService.create(
-        body.dni,
+        createPersonaDto,
         userId,
-        body.telefono,
-        body.email,
       );
       return {
         id: persona.id,
@@ -94,6 +92,12 @@ export class PersonasController {
     }
   }
 
+  @Roles(
+    Rol.SUPERADMINISTRADOR,
+    Rol.ADMINISTRADOR,
+    Rol.MODERADOR,
+    Rol.ASISTENTE,
+  )
   @Get(':id')
   @ApiOperation({
     summary: 'Buscar persona por su ID',

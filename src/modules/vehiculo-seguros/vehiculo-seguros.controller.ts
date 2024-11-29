@@ -116,6 +116,7 @@ export class VehiculoSegurosController {
     Rol.ADMINISTRADOR,
     Rol.MODERADOR,
     Rol.ASISTENTE,
+    
   )
   @Get(':id')
   findOne(@Param('id') id: number) {

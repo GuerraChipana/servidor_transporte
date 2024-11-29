@@ -111,7 +111,7 @@ export class TucService {
       where: { id_tuc: id, estado: 1 },
       relations: ['id_asociacion', 'id_vehiculo'],
     });
-    if (modiTuc)
+    if (!modiTuc)
       throw new NotFoundException(`EL TUC con ID ${id} esta inactivo`);
     await this.validaciones(updatetucdto, id);
     modiTuc.id_usuario_modificacion = id_usuario_modificacion;

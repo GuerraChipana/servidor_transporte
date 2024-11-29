@@ -21,14 +21,8 @@ import { Rol } from './entities/user_sistema.entity';
 import { CambiarRolUserDto } from './dto/rol-user_sistema.dto';
 import { CambiarCredencialesDto } from './dto/cambio-credenciales-user_sistema.dto';
 import { CambioEstadoUserDto } from './dto/cambio_estado-user_sistema.dto';
+import { UserRequestRequest } from '../user-request.Request';
 
-interface UserRequest extends Request {
-  user: {
-    id: number;
-    username: string;
-    rol: string;
-  };
-}
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('Endpoints de Usuarios de Sistemas')
 @Controller('users')
@@ -46,7 +40,7 @@ export class UserSistemasController {
   @ApiResponse({ status: 511, description: 'Auntenticacion requerida.' })
   async create(
     @Body() createUserSistemaDto: CreateUserSistemaDto,
-    @Request() req: UserRequest,
+    @Request() req: UserRequestRequest,
   ) {
     const id_usuario = req.user.id;
     const rol = req.user.rol;
@@ -69,7 +63,7 @@ export class UserSistemasController {
   @ApiResponse({ status: 200, description: 'Listado de usuarios con exito' })
   @ApiResponse({ status: 500, description: 'Error al listar usuarios' })
   @ApiResponse({ status: 511, description: 'Auntenticacion requerida.' })
-  async findAll(@Request() req: UserRequest) {
+  async findAll(@Request() req: UserRequestRequest) {
     const rol = req.user.rol;
     try {
       return await this.userSistemasService.findAll(rol);
@@ -84,6 +78,7 @@ export class UserSistemasController {
   // Endpoints para listar por id:
   @ApiOperation({ summary: 'Buscar un usuario del sistema por su Id' })
   @Get(':id')
+  @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @ApiResponse({ status: 511, description: 'Token requerido' })
   @ApiResponse({ status: 200, description: 'Usuario encontrado' })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
@@ -97,7 +92,7 @@ export class UserSistemasController {
 
   // Endpoints para cambiar de Rol a un usuario
   @ApiOperation({ summary: 'Cambiar de rol a un usuario' })
-  @Roles(Rol.SUPERADMINISTRADOR)
+  @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @Patch('rol/:id')
   @ApiResponse({
     status: 401,
@@ -112,7 +107,7 @@ export class UserSistemasController {
   async CambiarRol(
     @Param('id') id: number,
     @Body() cambiarRolUserDto: CambiarRolUserDto,
-    @Request() req: UserRequest,
+    @Request() req: UserRequestRequest,
   ) {
     const rol = req.user.rol;
     const id_usuario_modificacion = req.user.id;
@@ -125,7 +120,7 @@ export class UserSistemasController {
       );
     } catch (error) {
       console.error(error);
-      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
+      throw new NotFoundException(`${error.message}`);
     }
   }
 
@@ -148,7 +143,7 @@ export class UserSistemasController {
       'Contraseña actual incorrecta o no coinciden las nuevas contraseñas.',
   })
   async cambiarCredencial(
-    @Request() req: UserRequest,
+    @Request() req: UserRequestRequest,
     @Body() cambiarCredencialesDto: CambiarCredencialesDto,
   ) {
     const id_user = req.user.id;
@@ -174,7 +169,7 @@ export class UserSistemasController {
   @Patch('estado/:id')
   async cambioEstadoUser(
     @Param('id') id: number,
-    @Request() req: UserRequest,
+    @Request() req: UserRequestRequest,
     @Body() cambioEstadoUserDto: CambioEstadoUserDto,
   ) {
     const id_user_modificacion = req.user.id;

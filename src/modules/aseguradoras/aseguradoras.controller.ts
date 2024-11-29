@@ -100,7 +100,7 @@ export class AseguradorasController {
         userId,
       );
     } catch (error) {
-      throw new NotFoundException(`${error.message}`);
+      throw new InternalServerErrorException(`${error.message}`);
     }
   }
 

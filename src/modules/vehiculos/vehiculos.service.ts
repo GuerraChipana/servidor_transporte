@@ -23,10 +23,12 @@ export class VehiculoResponseDto {
   color: string;
   ano_de_compra: number;
   propietario1: {
+    id: number;
     dni: string;
     nombre: string;
   } | null;
   propietario2: {
+    id: number;
     dni: string;
     nombre: string;
   } | null;
@@ -93,26 +95,23 @@ export class VehiculosService {
       throw new BadRequestException('Los propietarios no pueden ser iguales');
     }
 
-    // Filtramos los IDs de los propietarios para eliminar los null o undefined
-    const proIds = [
-      createVehiculoDto.propietario1,
-      createVehiculoDto.propietario2,
-    ].filter(Boolean);
-
-    // Recuperamos todos los propietarios de la base de datos
-    const propietarios = await this.personaRepositorio.find({
-      where: { id: In(proIds) },
+    const pro1 = await this.personaRepositorio.findOne({
+      where: { id: createVehiculoDto.propietario1 },
+    });
+    const pro2 = await this.personaRepositorio.findOne({
+      where: { id: createVehiculoDto.propietario2 },
     });
 
-    const verificarPropietario = (id: number) => {
-      if (id && !propietarios.some((p) => p.id === id)) {
-        throw new BadRequestException(`No existe una persona con el id: ${id}`);
-      }
-    };
-
-    // Verificamos cada propietario
-    verificarPropietario(createVehiculoDto.propietario1);
-    verificarPropietario(createVehiculoDto.propietario2);
+    if (pro1 && pro1.estado === 0) {
+      throw new BadRequestException(
+        `El propietario ${pro1.nombre} no se encuentra activo`,
+      );
+    }
+    if (pro2 && pro2.estado === 0) {
+      throw new BadRequestException(
+        `El propietario ${pro2.nombre} no se encuentra activo`,
+      );
+    }
 
     await this.validaciones(createVehiculoDto);
 
@@ -126,19 +125,15 @@ export class VehiculosService {
         );
       } catch (error) {
         throw new BadRequestException(
-          'Error al subir la imagen:  ' + error.messaje,
+          'Error al subir la imagen:  ' + error.message,
         );
       }
     }
     // Creamos el vehículo con las instancias completas de los propietarios
     const vehiculo = this.vehiculoRepository.create({
       ...createVehiculoDto,
-      propietario1: propietarios.find(
-        (p) => p.id === createVehiculoDto.propietario1,
-      ),
-      propietario2: propietarios.find(
-        (p) => p.id === createVehiculoDto.propietario2,
-      ),
+      propietario1: pro1,
+      propietario2: pro2,
       imagen_url: imagenURL,
       id_usuario,
     });
@@ -237,14 +232,8 @@ export class VehiculosService {
     const vehiculos = await this.vehiculoRepository.find({
       relations: ['propietario1', 'propietario2'],
       select: {
-        propietario1: {
-          dni: true,
-          nombre: true,
-        },
-        propietario2: {
-          dni: true,
-          nombre: true,
-        },
+        propietario1: { id: true, dni: true, nombre: true },
+        propietario2: { id: true, dni: true, nombre: true },
       },
     });
 
@@ -260,12 +249,14 @@ export class VehiculosService {
         ano_de_compra: vehiculo.ano_de_compra,
         propietario1: vehiculo.propietario1
           ? {
+              id: vehiculo.propietario1.id,
               dni: vehiculo.propietario1.dni,
               nombre: vehiculo.propietario1.nombre,
             }
           : null,
         propietario2: vehiculo.propietario2
           ? {
+              id: vehiculo.propietario2.id,
               dni: vehiculo.propietario2.dni,
               nombre: vehiculo.propietario2.nombre,
             }
@@ -287,14 +278,8 @@ export class VehiculosService {
       where: { id },
       relations: ['propietario1', 'propietario2'],
       select: {
-        propietario1: {
-          dni: true,
-          nombre: true,
-        },
-        propietario2: {
-          dni: true,
-          nombre: true,
-        },
+        propietario1: { id: true, dni: true, nombre: true },
+        propietario2: { id: true, dni: true, nombre: true },
       },
     });
 
@@ -315,12 +300,14 @@ export class VehiculosService {
       ano_de_compra: vehiculo.ano_de_compra,
       propietario1: vehiculo.propietario1
         ? {
+            id: vehiculo.propietario1.id,
             dni: vehiculo.propietario1.dni,
             nombre: vehiculo.propietario1.nombre,
           }
         : null,
       propietario2: vehiculo.propietario2
         ? {
+            id: vehiculo.propietario2.id,
             dni: vehiculo.propietario2.dni,
             nombre: vehiculo.propietario2.nombre,
           }

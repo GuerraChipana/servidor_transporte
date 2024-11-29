@@ -122,10 +122,21 @@ export class EmpadronamientoService {
 
   async findAll(): Promise<Empadronamiento[]> {
     const empa = await this.empadronaminetoRepo.find({
-      relations: ['id_vehiculo'],
-      select: { id_vehiculo: { id: true, placa: true, imagen_url: true } },
+      relations: [
+        'id_vehiculo',
+        'id_vehiculo.propietario1',
+        'id_vehiculo.propietario2',
+      ],
+      select: {
+        id_vehiculo: {
+          id: true,
+          placa: true,
+          imagen_url: true,
+          propietario1: { dni: true, nombre: true },
+          propietario2: { dni: true, nombre: true },
+        },
+      },
     });
-
     return empa;
   }
 

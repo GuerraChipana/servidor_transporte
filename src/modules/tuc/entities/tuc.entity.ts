@@ -36,10 +36,10 @@ export class Tuc {
   @JoinColumn({ name: 'id_vehiculo' })
   id_vehiculo: Vehiculo;
 
-  @Column()
+  @Column({ type: 'date' })
   fecha_desde: Date;
 
-  @Column({ nullable: true })
+  @Column({ type: 'date', nullable: true })
   fecha_hasta: Date;
 
   @Column({ type: 'enum', enum: EstadoVigencia })

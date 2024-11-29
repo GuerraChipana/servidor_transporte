@@ -76,9 +76,7 @@ export class CreateVehiculoDto {
     description: 'ID del primer propietario del vehículo',
     example: 1,
   })
-  @IsInt()
   @IsNotEmpty({ message: 'No puede estar vacío el propietario' })
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true }) // Convierte el valor a número
   propietario1: number;
 
   @ApiProperty({
@@ -87,7 +85,5 @@ export class CreateVehiculoDto {
     required: false,
   })
   @IsOptional()
-  @IsInt()
-  @Transform(({ value }) => parseInt(value, 10), { toClassOnly: true }) // Convierte el valor a número
   propietario2?: number;
 }
