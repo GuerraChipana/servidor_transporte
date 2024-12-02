@@ -151,36 +151,4 @@ export class ConductoresController {
     }
   }
 
-  // Endpoint para asociar vehículos a un conductor
-  @Roles(Rol.ADMINISTRADOR, Rol.SUPERADMINISTRADOR)
-  @ApiResponse({ status: 200, description: 'Vehículos asociados con éxito' })
-  @ApiOperation({ summary: 'Actualizar un conductor con vehiculos' })
-  @Patch('asociarVehiculo/:id')
-  async asociarVehiculos(
-    @Param('id') id: number,
-    @Body() body: { vehiculos: number[] },
-  ) {
-    try {
-      // Extraer el array de vehiculos del body
-      const vehiculosIds = body.vehiculos;
-
-      // Llamar al servicio para asociar los vehículos al conductor
-      return await this.conductoresService.asociarVehiculosConductor(
-        id, // ID del conductor
-        vehiculosIds, // Array de IDs de vehículos
-      );
-    } catch (error) {
-      // Manejo específico de excepciones
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.message); // Devolver error 404 si el recurso no fue encontrado
-      }
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.message); // Devolver error 400 si la solicitud es incorrecta
-      }
-      // Si ocurre cualquier otro tipo de error, devolver error interno 500
-      throw new InternalServerErrorException(
-        `Error al asociar vehículos al conductor: ${error.message || error}`,
-      );
-    }
-  }
 }

@@ -140,144 +140,92 @@ export class ConductoresService {
     return conductorResponse;
   }
 
-  async asociarVehiculosConductor(
-    idConductor: number,
-    vehiculosIds: number[], // Array de IDs de vehículos
-  ) {
-    if (!Array.isArray(vehiculosIds)) {
-      throw new BadRequestException('vehiculosIds debe ser un array.');
-    }
-    if (vehiculosIds.length === 0) {
-      throw new BadRequestException(
-        'Se debe proporcionar al menos un ID de vehículo.',
-      );
-    }
-    if (!idConductor || idConductor <= 0 || isNaN(idConductor)) {
-      throw new BadRequestException('ID del conductor no válido');
-    }
-
-    let conductor;
-    try {
-      conductor = await this.conductoreRepositorio.findOne({
-        where: { id: idConductor },
-        relations: ['detalles', 'detalles.vehiculo'],
-      });
-      if (!conductor)
-        throw new NotFoundException(
-          `Conductor con ID ${idConductor} no encontrado`,
-        );
-    } catch (error) {
-      throw new NotFoundException(
-        `Conductor con ID ${idConductor} no encontrado`,
-      );
-    }
-
-    let vehiculos;
-    try {
-      vehiculos = await this.vehiculosRepositorio.find({
-        where: { id: In(vehiculosIds) },
-      });
-    } catch (error) {
-      throw new BadRequestException('Error al buscar los vehículos.');
-    }
-
-    if (vehiculos.length !== vehiculosIds.length) {
-      const vehiculosNoEncontrados = vehiculosIds.filter(
-        (id) => !vehiculos.some((v) => v.id === id),
-      );
-      throw new BadRequestException(
-        `Los siguientes vehículos no existen: ${vehiculosNoEncontrados.join(', ')}`,
-      );
-    }
-
-    try {
-      await this.detalleConductoresRepositorio.delete({
-        id_conductor: idConductor,
-      });
-    } catch (error) {
-      throw new InternalServerErrorException(
-        'Error al eliminar las relaciones de vehículos existentes',
-      );
-    }
-
-    const nuevasRelaciones = [];
-    for (const vehiculo of vehiculos) {
-      if (vehiculo.estado !== 1) {
-        continue;
-      }
-
-      // Crear la nueva relación
-      const nuevaRelacion = this.detalleConductoresRepositorio.create({
-        id_conductor: idConductor, // Aseguramos que se asigna correctamente el id_conductor
-        id_vehiculo: vehiculo.id, // Aseguramos que se asigna correctamente el id_vehiculo
-        conductor: conductor, // Relación bidireccional con conductor
-        vehiculo: vehiculo, // Relación bidireccional con vehículo
-      });
-
-      nuevasRelaciones.push(nuevaRelacion);
-    }
-    if (nuevasRelaciones.length > 0) {
-      try {
-        await this.detalleConductoresRepositorio.save(nuevasRelaciones);
-      } catch (error) {
-        throw new InternalServerErrorException(
-          'Error al guardar las relaciones',
-        );
-      }
-    }
-
-    // Recuperar el conductor con los vehículos asociados
-    let conductorConVehiculos;
-    try {
-      conductorConVehiculos = await this.conductoreRepositorio.findOne({
-        where: { id: conductor.id },
-        relations: ['detalles', 'detalles.vehiculo'],
-      });
-    } catch (error) {
-      throw new InternalServerErrorException(
-        'Error al recuperar los vehículos asociados.',
-      );
-    }
-
-    if (!conductorConVehiculos) {
-      throw new InternalServerErrorException(
-        'Error al recuperar los vehículos asociados.',
-      );
-    }
-
-    const conductorResponse = {
-      ...conductorConVehiculos,
-      vehiculos: conductorConVehiculos.detalles.map((detalle) => ({
-        id: detalle.vehiculo.id,
-        placa: detalle.vehiculo.placa,
-      })),
-    };
-
-    delete conductorResponse.detalles;
-
-    return conductorResponse;
-  }
-
   // Servicio para editar
   async update(
     id: number,
     updateConductoreDto: UpdateConductoreDto,
     id_usuario_modificacion: number,
   ): Promise<Conductore> {
+    // Obtener el conductor con sus detalles (vehículos)
     const conduc = await this.conductoreRepositorio.findOne({
       where: { id, estado: 1 },
+      relations: ['detalles', 'detalles.vehiculo'], // Relación con los vehículos
     });
-    if (!conduc)
-      throw new NotFoundException(
-        `Conductor con ID ${id} no se encuentra activo`,
-      );
+
+    if (!conduc) {
+      throw new NotFoundException(`Conductor con ID ${id} no encontrado.`);
+    }
+
+    // Validar que la licencia no esté duplicada
     await this.validarLicencia(updateConductoreDto, id);
+
+    // Eliminar las relaciones de vehículos previas del conductor
+    await this.detalleConductoresRepositorio.delete({
+      id_conductor: conduc.id,
+    });
+
+    // Asignar usuario de modificación
     conduc.id_usuario_modificacion = id_usuario_modificacion;
 
-    const { id_persona, ...resto } = updateConductoreDto;
-    Object.assign(conduc, resto);
+    // Asignar los valores del DTO de actualización al conductor
+    Object.assign(conduc, updateConductoreDto);
 
-    return await this.conductoreRepositorio.save(conduc);
+    // Guardar la actualización del conductor
+    await this.conductoreRepositorio.save(conduc);
+
+    // Si se proporcionan nuevos vehículos, manejamos las relaciones
+    if (
+      updateConductoreDto.vehiculos &&
+      updateConductoreDto.vehiculos.length > 0
+    ) {
+      // Obtener los vehículos proporcionados por ID
+      const vehiculos = await this.vehiculosRepositorio.findByIds(
+        updateConductoreDto.vehiculos,
+      );
+
+      // Verificar que los vehículos existen
+      if (vehiculos.length !== updateConductoreDto.vehiculos.length) {
+        throw new BadRequestException('Uno o más vehículos no existen.');
+      }
+
+      // Crear nuevas relaciones de vehículos
+      const detalles = vehiculos.map((vehiculo) => {
+        const detalle = this.detalleConductoresRepositorio.create({
+          id_conductor: conduc.id, // El ID del conductor se asigna aquí
+          id_vehiculo: vehiculo.id, // El ID del vehículo
+          conductor: conduc, // Relación bidireccional
+          vehiculo: vehiculo, // Relación bidireccional
+        });
+        return detalle;
+      });
+
+      // Guardar las nuevas relaciones
+      await this.detalleConductoresRepositorio.save(detalles);
+    }
+
+    // Cargar y devolver el conductor con sus relaciones completas
+    const conductorConVehiculos = await this.conductoreRepositorio.findOne({
+      where: { id: conduc.id },
+      relations: ['detalles', 'detalles.vehiculo', 'id_persona'],
+      select: {
+        id_persona: {
+          nombre: true,
+          apMaterno: true,
+          apPaterno: true,
+          foto: true,
+        },
+        detalles: {
+          id_conductor: false,
+          id_vehiculo: true,
+          vehiculo: {
+            id: true,
+            placa: true,
+          },
+        },
+      },
+    });
+
+    return conductorConVehiculos;
   }
 
   // Método para listar todos los conductores
@@ -299,9 +247,6 @@ export class ConductoresService {
           g_sangre: conductor.g_sangre,
           estado: conductor.estado,
           detalle_baja: conductor.detalle_baja,
-          id_usuario: conductor.id_usuario,
-          fecha_registro: conductor.fecha_registro,
-          fecha_modificacion: conductor.fecha_modificacion,
           id_persona: {
             id: conductor.id_persona.id,
             nombre: conductor.id_persona.nombre,
@@ -346,9 +291,6 @@ export class ConductoresService {
         g_sangre: conductor.g_sangre,
         estado: conductor.estado,
         detalle_baja: conductor.detalle_baja,
-        id_usuario: conductor.id_usuario,
-        fecha_registro: conductor.fecha_registro,
-        fecha_modificacion: conductor.fecha_modificacion,
         id_persona: {
           id: conductor.id_persona.id,
           nombre: conductor.id_persona.nombre,

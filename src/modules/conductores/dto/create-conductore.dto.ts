@@ -57,15 +57,13 @@ export class CreateConductoreDto {
 
   @ApiProperty({
     description: 'Fecha de inicio de la validez de la licencia del conductor',
-    type: String,
     format: 'date',
     example: '2024-11-01',
   })
-  @IsString({ message: 'La fecha de inicio debe ser una cadena de texto.' })
   @Matches(/^\d{4}-\d{2}-\d{2}$/, {
     message: 'La fecha debe estar en el formato válido: YYYY-MM-DD.',
   })
-  fecha_desde: string;
+  fecha_desde: Date;
 
   @ApiProperty({
     description: 'Restricciones asociadas a la licencia (opcional)',
