@@ -13,9 +13,10 @@ import { lastValueFrom } from 'rxjs';
 import { ImagenesService } from '../imagenes/imagenes.service';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
-import { DatosPersona } from './datos-persona.interfas';
+import { DatosPersona } from './datos-persona.interface';
 import { UpdatePersonaDto } from './dto/update-persona.dto';
 import { CambioEstadoPersonaDto } from './dto/estado-persona.dto';
+import { CreatePersonaDto } from './dto/create-persona.dto';
 
 @Injectable()
 export class PersonaService {
@@ -32,20 +33,20 @@ export class PersonaService {
 
   // Servicio para crear Persona //
   async create(
-    dni: string,
+    createPersonaDto: CreatePersonaDto,
     id_user: number,
-    telefono?: string,
-    email?: string,
   ): Promise<Persona> {
-    // Verificar que el usuario existe
+  
+    const { dni, telefono, email, password_consulta } = createPersonaDto;
+
     const user = await this.userRepository.findOne({ where: { id_user } });
     if (!user) {
       throw new InternalServerErrorException('Usuario no encontrado');
     }
 
     // Llamada a la API
-    const apiUrl = `${process.env.RENIEC_API}?nuDniConsulta=${dni}&nuDniUsuario=${process.env.RENIEC_USER}&nuRucUsuario=${process.env.RENIEC_RUC}&password=${process.env.RENIEC_PASSWORD}&out=json`;
-    // console.log('URL de la API:', apiUrl);
+    const apiUrl = `${process.env.RENIEC_API}?nuDniConsulta=${dni}&nuDniUsuario=${user.dni}&nuRucUsuario=${process.env.RENIEC_RUC}&password=${password_consulta}&out=json`;
+    console.log('URL de la API:', apiUrl);
 
     let personaData: DatosPersona;
     try {
@@ -81,7 +82,6 @@ export class PersonaService {
         `Error al subir la imagen: ${error.message}`,
       );
     }
-
 
     const fullImageUrl = imageUrl;
 
@@ -156,9 +156,26 @@ export class PersonaService {
           return RestoDatos; // Todo los campos menos los excluidos
         case 'moderador':
         case 'asistente':
-          const { id,dni, nombre, apPaterno, apMaterno, telefono, foto, email } =
-            persona;
-          return { id,dni, nombre, apPaterno, apMaterno, telefono, foto, email };
+          const {
+            id,
+            dni,
+            nombre,
+            apPaterno,
+            apMaterno,
+            telefono,
+            foto,
+            email,
+          } = persona;
+          return {
+            id,
+            dni,
+            nombre,
+            apPaterno,
+            apMaterno,
+            telefono,
+            foto,
+            email,
+          };
         default:
           return {};
       }
@@ -200,7 +217,6 @@ export class PersonaService {
 
     // Asignar el usuario de modificación y la fecha
     persona.id_usuario_modificacion = usuarioModificacion.id_user;
-    persona.fecha_modificacion = new Date();
 
     // Guardar los cambios
     return await this.personaRepository.save(persona);
@@ -212,10 +228,12 @@ export class PersonaService {
     updatePersonaDto: UpdatePersonaDto,
     id_usuario_modificacion: number,
   ): Promise<Persona> {
-    const persona = await this.personaRepository.findOne({ where: { id } });
+    const persona = await this.personaRepository.findOne({
+      where: { id, estado: 1 },
+    });
 
     if (!persona) {
-      throw new NotFoundException('Persona no encontrada');
+      throw new NotFoundException('Persona no se encuentra activa');
     }
 
     // Validar que el email no se repita si se proporciona
@@ -241,7 +259,6 @@ export class PersonaService {
 
     // Asignar el objeto de usuario de modificación
     persona.id_usuario_modificacion = usuarioModificacion.id_user;
-    persona.fecha_modificacion = new Date();
 
     // Guardar los cambios en la base de datos
     try {
@@ -255,17 +272,14 @@ export class PersonaService {
 
   private handleApiError(error: any) {
     if (error.response) {
-      console.error('Error en la API:', error.response.data);
       throw new InternalServerErrorException(
         `Error en la API: ${JSON.stringify(error.response.data)}`,
       );
     } else if (error.request) {
-      console.error('No se recibió respuesta de la API:', error.request);
       throw new InternalServerErrorException(
         'No se recibió respuesta de la API',
       );
     } else {
-      console.error('Error al configurar la solicitud:', error.message);
       throw new InternalServerErrorException(
         `Error al configurar la solicitud: ${error.message}`,
       );

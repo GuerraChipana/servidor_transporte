@@ -8,6 +8,13 @@ import { PersonasModule } from './modules/personas/personas.module';
 import { ImagenesModule } from './modules/imagenes/imagenes.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { AsociacionesModule } from './modules/asociaciones/asociaciones.module';
+import { AseguradorasModule } from './modules/aseguradoras/aseguradoras.module';
+import { ConductoresModule } from './modules/conductores/conductores.module';
+import { VehiculosModule } from './modules/vehiculos/vehiculos.module';
+import { DetalleConductoresModule } from './modules/detalle_conductores/detalle_conductores.module';
+import { VehiculoSegurosModule } from './modules/vehiculo-seguros/vehiculo-seguros.module';
+import { TucModule } from './modules/tuc/tuc.module';
+import { EmpadronamientoModule } from './modules/empadronamiento/empadronamiento.module';
 
 @Module({
   imports: [
@@ -33,6 +40,13 @@ import { AsociacionesModule } from './modules/asociaciones/asociaciones.module';
       serveRoot: '/imagenes/', // Ruta base para acceder a las imágenes
     }),
     AsociacionesModule,
+    AseguradorasModule,
+    ConductoresModule,
+    VehiculosModule,
+    DetalleConductoresModule,
+    VehiculoSegurosModule,
+    TucModule,
+    EmpadronamientoModule,
   ],
   controllers: [],
   providers: [],

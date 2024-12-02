@@ -57,7 +57,6 @@ export class AsociacionesService {
     id_usuario: number,
   ): Promise<Asociacione> {
     await this.validarExistencia(createAsociacioneDto); // Validación antes de crear
-
     const newAsoci = this.asociacionRepository.create({
       ...createAsociacioneDto,
       id_usuario,
@@ -72,15 +71,16 @@ export class AsociacionesService {
     updateAsociacioneDto: UpdateAsociacioneDto,
     id_usuario_modificacion: number,
   ): Promise<Asociacione> {
-    const asoci = await this.asociacionRepository.findOne({ where: { id } });
+    const asoci = await this.asociacionRepository.findOne({
+      where: { id, estado: 1 },
+    });
     if (!asoci) {
-      throw new NotFoundException('Asociación no encontrada');
+      throw new NotFoundException('Asociación no se encuentra activa');
     }
 
-    await this.validarExistencia(updateAsociacioneDto, id); 
+    await this.validarExistencia(updateAsociacioneDto, id);
 
     asoci.id_usuario_modificacion = id_usuario_modificacion;
-    asoci.fecha_modificacion = new Date();
 
     Object.assign(asoci, updateAsociacioneDto);
 
@@ -126,7 +126,6 @@ export class AsociacionesService {
     }
 
     asoci.id_usuario_modificacion = id_usuario_modificacion;
-    asoci.fecha_modificacion = new Date();
     return await this.asociacionRepository.save(asoci);
   }
 }

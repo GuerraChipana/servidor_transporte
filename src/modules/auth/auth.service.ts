@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { UserSistema } from '../user_sistemas/entities/user_sistema.entity';
+import { time } from 'console';
 
 @Injectable() // Decorador que indica que esta clase es un servicio
 export class AuthService {
@@ -14,15 +15,18 @@ export class AuthService {
     private readonly userSistemaRepository: Repository<UserSistema>, // Repositorio para interactuar con la base de datos
   ) {}
 
-  // Método para manejar el login
   async login(loginDto: LoginDto): Promise<{ access_token: string }> {
     const user = await this.validateUser(loginDto.username, loginDto.password); // Valida las credenciales del usuario
     const payload = {
-      id: user.id_user, // Incluye el ID en el payload del token
-      username: user.username, // Incluye el nombre de usuario
-      rol: user.rol, // Incluye el rol del usuario
+      id: user.id_user,
+      rol: user.rol,
+      nombre: user.nombre,
     };
-    return { access_token: this.jwtService.sign(payload) };
+    const expiresIn = '1h';
+    // Firma el token con la expiración
+    const access_token = this.jwtService.sign(payload, { expiresIn });
+
+    return { access_token };
   }
 
   // Método privado para validar al usuario
@@ -53,6 +57,29 @@ export class AuthService {
       throw new UnauthorizedException('Contraseña incorrecta');
     }
 
+    return user;
+  }
+
+  async bievenida(id: number) {
+    const user = await this.userSistemaRepository.findOne({
+      where: { id_user: id },
+      select: { nombre: true, apPaterno: true, rol: true },
+    });
+
+    return user;
+  }
+
+  async cuenta(id: number) {
+    const user = await this.userSistemaRepository.findOne({
+      where: { id_user: id },
+      select: {
+        nombre: true,
+        apPaterno: true,
+        apMaterno: true,
+        email: true,
+        rol: true,
+      },
+    });
     return user;
   }
 }

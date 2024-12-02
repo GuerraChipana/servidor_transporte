@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { UserSistemasService } from './user_sistemas.service';
 import { CreateUserSistemaDto } from './dto/create-user_sistema.dto';
-import { ApiTags, ApiBody, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiBody, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt.auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -21,22 +21,16 @@ import { Rol } from './entities/user_sistema.entity';
 import { CambiarRolUserDto } from './dto/rol-user_sistema.dto';
 import { CambiarCredencialesDto } from './dto/cambio-credenciales-user_sistema.dto';
 import { CambioEstadoUserDto } from './dto/cambio_estado-user_sistema.dto';
+import { UserRequestRequest } from '../user-request.Request';
 
-interface UserRequest extends Request {
-  user: {
-    id: number;
-    username: string;
-    rol: string;
-  };
-}
-
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('Endpoints de Usuarios de Sistemas')
 @Controller('users')
 export class UserSistemasController {
   constructor(private readonly userSistemasService: UserSistemasService) {}
 
   // Endpoints para crear un nuevo usuario:
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiOperation({ summary: 'Registrar un nuevo usuario al sistema' })
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @HttpCode(201)
   @Post('registrar')
@@ -46,7 +40,7 @@ export class UserSistemasController {
   @ApiResponse({ status: 511, description: 'Auntenticacion requerida.' })
   async create(
     @Body() createUserSistemaDto: CreateUserSistemaDto,
-    @Request() req: UserRequest,
+    @Request() req: UserRequestRequest,
   ) {
     const id_usuario = req.user.id;
     const rol = req.user.rol;
@@ -63,13 +57,13 @@ export class UserSistemasController {
   }
 
   // Endpoints para listado de todos los usuarios:
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiOperation({ summary: 'Listar todos los usuarios del sistema' })
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @Get('listar')
   @ApiResponse({ status: 200, description: 'Listado de usuarios con exito' })
   @ApiResponse({ status: 500, description: 'Error al listar usuarios' })
   @ApiResponse({ status: 511, description: 'Auntenticacion requerida.' })
-  async findAll(@Request() req: UserRequest) {
+  async findAll(@Request() req: UserRequestRequest) {
     const rol = req.user.rol;
     try {
       return await this.userSistemasService.findAll(rol);
@@ -82,8 +76,9 @@ export class UserSistemasController {
   }
 
   // Endpoints para listar por id:
-  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Buscar un usuario del sistema por su Id' })
   @Get(':id')
+  @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @ApiResponse({ status: 511, description: 'Token requerido' })
   @ApiResponse({ status: 200, description: 'Usuario encontrado' })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
@@ -96,8 +91,8 @@ export class UserSistemasController {
   }
 
   // Endpoints para cambiar de Rol a un usuario
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Rol.SUPERADMINISTRADOR)
+  @ApiOperation({ summary: 'Cambiar de rol a un usuario' })
+  @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @Patch('rol/:id')
   @ApiResponse({
     status: 401,
@@ -112,7 +107,7 @@ export class UserSistemasController {
   async CambiarRol(
     @Param('id') id: number,
     @Body() cambiarRolUserDto: CambiarRolUserDto,
-    @Request() req: UserRequest,
+    @Request() req: UserRequestRequest,
   ) {
     const rol = req.user.rol;
     const id_usuario_modificacion = req.user.id;
@@ -125,12 +120,18 @@ export class UserSistemasController {
       );
     } catch (error) {
       console.error(error);
-      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
+      throw new NotFoundException(`${error.message}`);
     }
   }
 
   // Endpoints para cambiar tus mismas credenciales
-  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Cambiar tus propios datos' })
+  @Roles(
+    Rol.MODERADOR,
+    Rol.ASISTENTE,
+    Rol.ADMINISTRADOR,
+    Rol.SUPERADMINISTRADOR,
+  )
   @Patch('cambio-credencial')
   @ApiResponse({
     status: 200,
@@ -142,7 +143,7 @@ export class UserSistemasController {
       'Contraseña actual incorrecta o no coinciden las nuevas contraseñas.',
   })
   async cambiarCredencial(
-    @Request() req: UserRequest,
+    @Request() req: UserRequestRequest,
     @Body() cambiarCredencialesDto: CambiarCredencialesDto,
   ) {
     const id_user = req.user.id;
@@ -153,7 +154,7 @@ export class UserSistemasController {
   }
 
   // Endpoints para cambiar de estado a un usuario
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiOperation({ summary: 'Cambior estado a un usuario' })
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @ApiResponse({
     status: 404,
@@ -168,7 +169,7 @@ export class UserSistemasController {
   @Patch('estado/:id')
   async cambioEstadoUser(
     @Param('id') id: number,
-    @Request() req: UserRequest,
+    @Request() req: UserRequestRequest,
     @Body() cambioEstadoUserDto: CambioEstadoUserDto,
   ) {
     const id_user_modificacion = req.user.id;

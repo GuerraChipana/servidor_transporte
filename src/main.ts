@@ -17,10 +17,15 @@ async function bootstrap() {
       'Esta es la documentación para el Sistema de Transporte con todos sus controladores',
     )
     .setVersion('1.0')
-    .addTag('Endpoints para Login')
+    .addTag('Login')
     .addTag('Endpoints de Usuarios de Sistemas')
     .addTag('Endpoints de Personas')
-    .addTag('Endpoints para subir imagenes')
+    .addTag('Endpoints de Seguro vehicular')
+    .addTag('Endpoints para vehiculos')
+    .addTag('Endpoints de Conductores')
+    .addTag('Endpoints de Aseguradoras')
+    .addTag('Endpoints de Asociaciones')
+    .addTag('Endpoints de Empadronamiento')
     .build();
 
   // Generación de la documentación

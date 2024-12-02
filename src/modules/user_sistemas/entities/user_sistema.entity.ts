@@ -62,6 +62,18 @@ export class UserSistema {
   @UpdateDateColumn({ name: 'fecha_modificacion' })
   fecha_modificacion: Date;
 
+  // Relación con la entidad Persona
   @OneToMany(() => Persona, (persona) => persona.id_usuario)
   personas: Persona[];
+
+  @Column({
+    name: 'two_factor_secret',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
+  twoFactorSecret: string;
+
+  @Column({ name: 'is_two_factor_enabled', type: 'boolean', default: false })
+  isTwoFactorEnabled: boolean;
 }

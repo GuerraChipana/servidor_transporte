@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ImagenesService } from './imagenes.service';
-import { ImagenesController } from './imagenes.controller';
 
 @Module({
   providers: [ImagenesService],
-  controllers: [ImagenesController],
+  controllers: [],
   exports: [ImagenesService],
 })
 export class ImagenesModule {}
