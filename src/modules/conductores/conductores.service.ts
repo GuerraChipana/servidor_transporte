@@ -209,6 +209,7 @@ export class ConductoresService {
       relations: ['detalles', 'detalles.vehiculo', 'id_persona'],
       select: {
         id_persona: {
+          dni: true,
           nombre: true,
           apMaterno: true,
           apPaterno: true,
@@ -249,6 +250,7 @@ export class ConductoresService {
           detalle_baja: conductor.detalle_baja,
           id_persona: {
             id: conductor.id_persona.id,
+            dni: conductor.id_persona.dni,
             nombre: conductor.id_persona.nombre,
             apellidos: `${conductor.id_persona.apPaterno} ${conductor.id_persona.apMaterno.charAt(0)}.`,
             foto: conductor.id_persona.foto,
@@ -293,7 +295,8 @@ export class ConductoresService {
         detalle_baja: conductor.detalle_baja,
         id_persona: {
           id: conductor.id_persona.id,
-          nombre: conductor.id_persona.nombre,
+          dni: conductor.id_persona.dni,
+            nombre: conductor.id_persona.nombre,
           apellidos: `${conductor.id_persona.apPaterno} ${conductor.id_persona.apMaterno.charAt(0)}.`,
           foto: conductor.id_persona.foto,
         },

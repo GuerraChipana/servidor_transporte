@@ -28,7 +28,7 @@ export class ImagenesService {
     const fileExtension = file.originalname.split('.').pop()?.toLowerCase();
     if (!validExtensions.includes(`.${fileExtension}`)) {
       throw new BadRequestException(
-        'Solo se permiten archivos de imagen (.jpg, .png, .gif)',
+        'Solo se permiten archivos de imagen (.jpg, .png, .jpeg .gif)',
       );
     }
 

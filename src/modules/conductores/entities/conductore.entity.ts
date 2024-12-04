@@ -39,7 +39,7 @@ export class Conductore {
   @Column({ type: 'date' })
   fecha_hasta: Date;
 
-  @Column({ type: 'varchar', length: 10, default: 'Clase B' })
+  @Column({ type: 'varchar', length: 10, default: 'B' })
   clase: string;
 
   @Column({

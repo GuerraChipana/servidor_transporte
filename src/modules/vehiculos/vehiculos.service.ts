@@ -133,7 +133,7 @@ export class VehiculosService {
     const vehiculo = this.vehiculoRepository.create({
       ...createVehiculoDto,
       propietario1: pro1,
-      propietario2: pro2,
+      propietario2: pro2 || null,
       imagen_url: imagenURL,
       id_usuario,
     });
