@@ -1,9 +1,16 @@
-import { IsOptional, IsEmail, IsNotEmpty, Length, Matches } from 'class-validator';
+import {
+  IsOptional,
+  IsEmail,
+  IsNotEmpty,
+  Length,
+  Matches,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdatePersonaDto {
   @ApiProperty({
-    description: 'Teléfono de la persona (opcional), debe ser un número válido de Perú y comenzar con 9',
+    description:
+      'Teléfono de la persona (opcional), debe ser un número válido de Perú y comenzar con 9',
   })
   @IsOptional()
   @Matches(/^(?:\+51)?9\d{8}$/, {

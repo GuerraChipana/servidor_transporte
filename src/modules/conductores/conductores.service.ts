@@ -296,7 +296,7 @@ export class ConductoresService {
         id_persona: {
           id: conductor.id_persona.id,
           dni: conductor.id_persona.dni,
-            nombre: conductor.id_persona.nombre,
+          nombre: conductor.id_persona.nombre,
           apellidos: `${conductor.id_persona.apPaterno} ${conductor.id_persona.apMaterno.charAt(0)}.`,
           foto: conductor.id_persona.foto,
         },

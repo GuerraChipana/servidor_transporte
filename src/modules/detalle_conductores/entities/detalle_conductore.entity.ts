@@ -11,12 +11,16 @@ export class DetalleConductore {
   id_vehiculo: number;
 
   // Relación con conductor: no puede ser NULL
-  @ManyToOne(() => Conductore, (conductor) => conductor.detalles, { nullable: false })
+  @ManyToOne(() => Conductore, (conductor) => conductor.detalles, {
+    nullable: false,
+  })
   @JoinColumn({ name: 'id_conductor' })
   conductor: Conductore;
 
   // Relación con vehiculo: no puede ser NULL
-  @ManyToOne(() => Vehiculo, (vehiculo) => vehiculo.detalles, { nullable: false })
+  @ManyToOne(() => Vehiculo, (vehiculo) => vehiculo.detalles, {
+    nullable: false,
+  })
   @JoinColumn({ name: 'id_vehiculo' })
   vehiculo: Vehiculo;
 }

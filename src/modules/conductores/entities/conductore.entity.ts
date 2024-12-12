@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BeforeInsert,
-  BeforeUpdate, 
+  BeforeUpdate,
   OneToMany,
 } from 'typeorm';
 import { Persona } from 'src/modules/personas/entities/persona.entity';

@@ -48,7 +48,7 @@ export class EmpadronamientoService {
         throw new BadRequestException('El vehiculo no se encunetra activo');
     }
   }
-git 
+  git;
   async create(
     createEmpadronamientoDto: CreateEmpadronamientoDto,
     id_usuario: number,

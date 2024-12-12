@@ -150,5 +150,4 @@ export class ConductoresController {
       throw new NotFoundException(`${error.mesage}`);
     }
   }
-
 }

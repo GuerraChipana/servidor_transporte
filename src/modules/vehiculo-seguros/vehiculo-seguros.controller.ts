@@ -73,8 +73,10 @@ export class VehiculoSegurosController {
     }
   }
 
-  
-  @ApiResponse({ status: 201, description: 'Estado del seguro cambiado con éxito' })
+  @ApiResponse({
+    status: 201,
+    description: 'Estado del seguro cambiado con éxito',
+  })
   @ApiOperation({ summary: 'Cambiar estado a un seguro' })
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @Patch('estado/:id')
@@ -95,7 +97,6 @@ export class VehiculoSegurosController {
     }
   }
 
-
   @ApiResponse({ status: 200, description: 'Listado de Seguros completo' })
   @ApiOperation({ summary: 'Listado completo de los seguros' })
   @Roles(
@@ -109,14 +110,16 @@ export class VehiculoSegurosController {
     return await this.vehiculoSegurosService.findAll();
   }
 
-  @ApiResponse({ status: 200, description: 'Id del seguro buscado correctamente' })
+  @ApiResponse({
+    status: 200,
+    description: 'Id del seguro buscado correctamente',
+  })
   @ApiOperation({ summary: 'Buscador por Id del seguro' })
   @Roles(
     Rol.SUPERADMINISTRADOR,
     Rol.ADMINISTRADOR,
     Rol.MODERADOR,
     Rol.ASISTENTE,
-    
   )
   @Get(':id')
   findOne(@Param('id') id: number) {

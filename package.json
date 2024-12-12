@@ -7,11 +7,10 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+    "start": "node dist/main.js",
     "start:dev": "nodemon --exec ts-node --require tsconfig-paths/register src/main.ts",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/main.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -75,6 +74,14 @@
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.6.3"
+  },
+  "pkg": {
+    "assets": [
+      "src/**/*.json",
+      "src/**/*.yml",
+      "src/**/*.env"
+    ],
+    "bin": "./dist/main.js"
   },
   "jest": {
     "moduleFileExtensions": [

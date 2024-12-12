@@ -36,7 +36,6 @@ export class PersonaService {
     createPersonaDto: CreatePersonaDto,
     id_user: number,
   ): Promise<Persona> {
-  
     const { dni, telefono, email, password_consulta } = createPersonaDto;
 
     const user = await this.userRepository.findOne({ where: { id_user } });

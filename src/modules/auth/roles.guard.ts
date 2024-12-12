@@ -13,7 +13,7 @@ export class RolesGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    
+
     // Obtener roles de la ruta
     const roles = this.reflector.get<Rol[]>('roles', context.getHandler());
     if (!roles) {
@@ -23,7 +23,9 @@ export class RolesGuard implements CanActivate {
     const user = request.user; // El usuario ya se estableció en JwtAuthGuard
 
     if (!user || !this.hasRole(user, roles)) {
-      throw new ForbiddenException('No tienes permisos para acceder a este recurso');
+      throw new ForbiddenException(
+        'No tienes permisos para acceder a este recurso',
+      );
     }
 
     return true; // Acceso permitido

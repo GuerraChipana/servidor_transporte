@@ -1,4 +1,4 @@
-import { Tuc } from "src/modules/tuc/entities/tuc.entity";
+import { Tuc } from 'src/modules/tuc/entities/tuc.entity';
 import {
   Entity,
   Column,
@@ -35,7 +35,6 @@ export class Asociacione {
   @UpdateDateColumn({ type: 'timestamp' })
   fecha_modificacion: Date;
 
-   @OneToMany(() => Tuc, tuc => tuc.id_asociacion)
-   Tucs: Tuc[];
-   
+  @OneToMany(() => Tuc, (tuc) => tuc.id_asociacion)
+  Tucs: Tuc[];
 }

@@ -107,6 +107,9 @@ export class CreateConductoreDto {
   })
   @IsOptional()
   @IsArray()
-  @IsNotEmpty({ each: true, message: 'Cada ID de vehículo debe ser un número válido.' })
+  @IsNotEmpty({
+    each: true,
+    message: 'Cada ID de vehículo debe ser un número válido.',
+  })
   vehiculos?: number[];
 }
