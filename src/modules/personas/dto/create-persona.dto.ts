@@ -43,7 +43,6 @@ export class CreatePersonaDto {
   })
   @IsOptional()
   @IsEmail({}, { message: 'El correo electrónico debe ser válido' })
-  @IsNotEmpty({ message: 'El correo electrónico no puede estar vacío' })
   @Length(8, 100, {
     message: 'El correo electrónico debe tener entre 8 y 100 caracteres',
   })
