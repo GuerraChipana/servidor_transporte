@@ -15,6 +15,7 @@ import { DetalleConductoresModule } from './modules/detalle_conductores/detalle_
 import { VehiculoSegurosModule } from './modules/vehiculo-seguros/vehiculo-seguros.module';
 import { TucModule } from './modules/tuc/tuc.module';
 import { EmpadronamientoModule } from './modules/empadronamiento/empadronamiento.module';
+import { BusquedaModule } from './modules/busqueda/busqueda.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { EmpadronamientoModule } from './modules/empadronamiento/empadronamiento
     VehiculoSegurosModule,
     TucModule,
     EmpadronamientoModule,
+    BusquedaModule,
   ],
   controllers: [],
   providers: [],
