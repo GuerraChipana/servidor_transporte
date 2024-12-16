@@ -85,9 +85,12 @@ export class VehiculosService {
     id_usuario: number,
     file: Express.Multer.File,
   ): Promise<Vehiculo> {
+    // Verificar que el primer propietario esté presente
     if (!createVehiculoDto.propietario1) {
       throw new BadRequestException('El propietario 1 es obligatorio');
     }
+
+    // Validar que los propietarios no sean iguales
     if (
       createVehiculoDto.propietario2 &&
       createVehiculoDto.propietario1 === createVehiculoDto.propietario2
@@ -95,26 +98,37 @@ export class VehiculosService {
       throw new BadRequestException('Los propietarios no pueden ser iguales');
     }
 
+    // Buscar el primer propietario
     const pro1 = await this.personaRepositorio.findOne({
       where: { id: createVehiculoDto.propietario1 },
     });
-    const pro2 = await this.personaRepositorio.findOne({
-      where: { id: createVehiculoDto.propietario2 },
-    });
 
+    // Buscar el segundo propietario solo si está presente
+    let pro2 = null; // Inicializar como null por defecto
+    if (createVehiculoDto.propietario2) {
+      pro2 = await this.personaRepositorio.findOne({
+        where: { id: createVehiculoDto.propietario2 },
+      });
+    }
+
+    // Verificar que el primer propietario esté activo
     if (pro1 && pro1.estado === 0) {
       throw new BadRequestException(
         `El propietario ${pro1.nombre} no se encuentra activo`,
       );
     }
+
+    // Verificar que el segundo propietario (si existe) esté activo
     if (pro2 && pro2.estado === 0) {
       throw new BadRequestException(
         `El propietario ${pro2.nombre} no se encuentra activo`,
       );
     }
 
+    // Realizar otras validaciones
     await this.validaciones(createVehiculoDto);
 
+    // Subir la imagen si está presente
     let imagenURL: string | undefined;
     if (file) {
       try {
@@ -129,15 +143,17 @@ export class VehiculosService {
         );
       }
     }
-    // Creamos el vehículo con las instancias completas de los propietarios
+
+    // Crear el vehículo con los propietarios y la imagen
     const vehiculo = this.vehiculoRepository.create({
       ...createVehiculoDto,
       propietario1: pro1,
-      propietario2: pro2 || null,
+      propietario2: pro2, // Se asigna null si pro2 no existe
       imagen_url: imagenURL,
       id_usuario,
     });
 
+    // Guardar el vehículo en la base de datos
     return await this.vehiculoRepository.save(vehiculo);
   }
 

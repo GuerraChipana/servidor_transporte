@@ -85,5 +85,5 @@ export class CreateVehiculoDto {
     required: false,
   })
   @IsOptional()
-  propietario2?: number;
+  propietario2?: number|null;
 }
