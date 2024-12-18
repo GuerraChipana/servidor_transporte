@@ -45,7 +45,7 @@ async function bootstrap() {
 
   // Escucha el puerto 5000 en caso no se tenga el valor de PORT
   await app.listen(process.env.PORT);
-  console.log(app.listen)
+  console.log(app.listen(process.env.PORT))
 }
 
 bootstrap();
