@@ -26,7 +26,7 @@ import { Rol } from '../user_sistemas/entities/user_sistema.entity';
 @ApiResponse({ status: 400, description: 'Mala petición' })
 @ApiTags('Endpoints de TUC')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('tuc')
+@Controller('api/tuc')
 export class TucController {
   constructor(private readonly tucService: TucService) {}
 

@@ -25,7 +25,7 @@ import { UserRequestRequest } from 'src/modules/user-request.Request';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiResponse({ status: 400, description: 'Mala petición' })
 @ApiTags('Endpoints de Asociaciones')
-@Controller('asociaciones')
+@Controller('api/asociaciones')
 export class AsociacionesController {
   constructor(private readonly asociacionesService: AsociacionesService) {}
 

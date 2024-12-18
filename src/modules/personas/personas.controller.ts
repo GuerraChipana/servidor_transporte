@@ -24,7 +24,7 @@ import { UserRequestRequest } from 'src/modules/user-request.Request';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('Endpoints de Personas')
-@Controller('personas')
+@Controller('api/personas')
 export class PersonasController {
   constructor(private readonly personasService: PersonaService) {}
 

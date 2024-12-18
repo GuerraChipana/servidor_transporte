@@ -26,7 +26,7 @@ import { Rol } from '../user_sistemas/entities/user_sistema.entity';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('Endpoints para vehiculos')
-@Controller('vehiculos')
+@Controller('api/vehiculos')
 export class VehiculosController {
   constructor(private readonly vehiculosService: VehiculosService) {}
 

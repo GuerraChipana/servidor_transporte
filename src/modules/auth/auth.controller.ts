@@ -15,7 +15,7 @@ import { UserRequestRequest } from '../user-request.Request';
 import { JwtAuthGuard } from './jwt.auth.guard';
 
 @ApiTags('Login')
-@Controller('Login')
+@Controller('api/Login')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

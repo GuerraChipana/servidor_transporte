@@ -26,7 +26,7 @@ import { Rol } from '../user_sistemas/entities/user_sistema.entity';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiResponse({ status: 400, description: 'Mala peticion' })
 @ApiTags('Endpoints de Conductores')
-@Controller('conductores')
+@Controller('api/conductores')
 export class ConductoresController {
   constructor(private readonly conductoresService: ConductoresService) {}
 

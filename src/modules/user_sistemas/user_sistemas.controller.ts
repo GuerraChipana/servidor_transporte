@@ -25,7 +25,7 @@ import { UserRequestRequest } from '../user-request.Request';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('Endpoints de Usuarios de Sistemas')
-@Controller('users')
+@Controller('api/users')
 export class UserSistemasController {
   constructor(private readonly userSistemasService: UserSistemasService) {}
 

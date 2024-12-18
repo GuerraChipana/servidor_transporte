@@ -4,7 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as dotenv from 'dotenv';
-dotenv.config();  // Carga las variables de entorno
+dotenv.config(); // Carga las variables de entorno
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -42,9 +42,6 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-
-  // Escucha el puerto 5000 en caso no se tenga el valor de PORT
   await app.listen(process.env.PORT);
 }
-
 bootstrap();

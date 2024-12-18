@@ -22,7 +22,7 @@ import { Rol } from '../user_sistemas/entities/user_sistema.entity';
 
 @ApiTags('Endpoints de Empadronamiento')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('empadronamiento')
+@Controller('api/empadronamiento')
 export class EmpadronamientoController {
   constructor(
     private readonly empadronamientoService: EmpadronamientoService,

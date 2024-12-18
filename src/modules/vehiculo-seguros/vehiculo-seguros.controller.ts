@@ -25,7 +25,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiResponse({ status: 400, description: 'Mala petición' })
 @ApiTags('Endpoints de Seguro vehicular')
-@Controller('vehiculo-seguros')
+@Controller('api/vehiculo-seguros')
 export class VehiculoSegurosController {
   constructor(
     private readonly vehiculoSegurosService: VehiculoSegurosService,

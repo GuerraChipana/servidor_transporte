@@ -24,7 +24,7 @@ import { CambioEstadoAseguradoraDto } from './dto/cambioestado.dto';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiResponse({ status: 400, description: 'Mala petición' })
 @ApiTags('Endpoints de Aseguradoras')
-@Controller('aseguradoras')
+@Controller('api/aseguradoras')
 export class AseguradorasController {
   constructor(private readonly aseguradorasService: AseguradorasService) {}
 
