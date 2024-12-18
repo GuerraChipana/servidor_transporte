@@ -39,13 +39,29 @@ export class EmpadronamientoService {
         );
     }
 
+    // Validación de vehículo ya empadronado
     if (crearorUpdateDto.id_vehiculo) {
+      // Verifica si ya existe un empadronamiento activo para ese vehículo
+      const existingEmpadronamiento = await this.empadronaminetoRepo.findOne({
+        where: {
+          id_vehiculo: { id: crearorUpdateDto.id_vehiculo },
+          estado: 1,
+        },
+      });
+
+      if (existingEmpadronamiento) {
+        throw new BadRequestException(
+          'Este vehículo ya tiene un empadronamiento activo',
+        );
+      }
+
+      // Verificación de la existencia y estado del vehículo
       const vehi = await this.vehiculoRepo.findOne({
         where: { id: crearorUpdateDto.id_vehiculo },
       });
       if (!vehi) throw new NotFoundException('El vehiculo no existe');
       if (vehi.estado !== 1)
-        throw new BadRequestException('El vehiculo no se encunetra activo');
+        throw new BadRequestException('El vehiculo no se encuentra activo');
     }
   }
 
@@ -128,6 +144,10 @@ export class EmpadronamientoService {
         'id_vehiculo.propietario2',
       ],
       select: {
+        id_empa: true,
+        n_empadronamiento: true,
+        estado: true,
+        detalle_baja: true,
         id_vehiculo: {
           id: true,
           placa: true,
