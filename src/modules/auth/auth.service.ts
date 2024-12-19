@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { UserSistema } from '../user_sistemas/entities/user_sistema.entity';
-import { time } from 'console';
 
 @Injectable() // Decorador que indica que esta clase es un servicio
 export class AuthService {

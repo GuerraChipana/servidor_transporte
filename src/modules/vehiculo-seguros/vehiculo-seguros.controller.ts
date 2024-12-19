@@ -20,20 +20,14 @@ import { RolesGuard } from '../auth/roles.guard';
 import { CambioEstadoSeguroVehiculoDto } from './dto/cambioestado-conductore.dto';
 import { Roles } from '../auth/roles.decorator';
 import { Rol } from '../user_sistemas/entities/user_sistema.entity';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiResponse({ status: 400, description: 'Mala petición' })
-@ApiTags('Endpoints de Seguro vehicular')
 @Controller('api/vehiculo-seguros')
 export class VehiculoSegurosController {
   constructor(
     private readonly vehiculoSegurosService: VehiculoSegurosService,
   ) {}
 
-  @ApiResponse({ status: 201, description: 'Seguro creado con éxito' })
-  @ApiResponse({ status: 500, description: 'Error al crear el seguro' })
-  @ApiOperation({ summary: 'Crear un seguro vehicular' })
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @Post()
   async create(
@@ -51,9 +45,6 @@ export class VehiculoSegurosController {
     }
   }
 
-  @ApiResponse({ status: 201, description: 'Seguro editado con éxito' })
-  @ApiResponse({ status: 500, description: 'Error al editar el seguro' })
-  @ApiOperation({ summary: 'Actualizar un seguro vehicular' })
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @Patch(':id')
   update(
@@ -73,11 +64,6 @@ export class VehiculoSegurosController {
     }
   }
 
-  @ApiResponse({
-    status: 201,
-    description: 'Estado del seguro cambiado con éxito',
-  })
-  @ApiOperation({ summary: 'Cambiar estado a un seguro' })
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
   @Patch('estado/:id')
   async estado(
@@ -97,8 +83,6 @@ export class VehiculoSegurosController {
     }
   }
 
-  @ApiResponse({ status: 200, description: 'Listado de Seguros completo' })
-  @ApiOperation({ summary: 'Listado completo de los seguros' })
   @Roles(
     Rol.SUPERADMINISTRADOR,
     Rol.ADMINISTRADOR,
@@ -110,11 +94,6 @@ export class VehiculoSegurosController {
     return await this.vehiculoSegurosService.findAll();
   }
 
-  @ApiResponse({
-    status: 200,
-    description: 'Id del seguro buscado correctamente',
-  })
-  @ApiOperation({ summary: 'Buscador por Id del seguro' })
   @Roles(
     Rol.SUPERADMINISTRADOR,
     Rol.ADMINISTRADOR,

@@ -16,11 +16,9 @@ import { UserRequestRequest } from '../user-request.Request';
 import { JwtAuthGuard } from '../auth/jwt.auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { EstadoEmpadronamientoDto } from './dto/estado-empadronamiento.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../auth/roles.decorator';
 import { Rol } from '../user_sistemas/entities/user_sistema.entity';
 
-@ApiTags('Endpoints de Empadronamiento')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('api/empadronamiento')
 export class EmpadronamientoController {
@@ -28,13 +26,7 @@ export class EmpadronamientoController {
     private readonly empadronamientoService: EmpadronamientoService,
   ) {}
 
-  @ApiOperation({ summary: 'Registrar un nuevo usuario al sistema' })
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
-  @ApiResponse({
-    status: 201,
-    description: 'Empadronamiento registrado con éxito.',
-  })
-  @ApiResponse({ status: 500, description: 'Erro al crear .' })
   @Post()
   async create(
     @Body() createEmpadronamientoDto: CreateEmpadronamientoDto,
@@ -57,11 +49,6 @@ export class EmpadronamientoController {
     Rol.ADMINISTRADOR,
     Rol.SUPERADMINISTRADOR,
   )
-  @ApiResponse({
-    status: 200,
-    description: 'Listado de empadronamiento completo',
-  })
-  @ApiOperation({ summary: 'Listado completo de las Empadronamientos' })
   @Get()
   findAll() {
     return this.empadronamientoService.findAll();
@@ -73,8 +60,6 @@ export class EmpadronamientoController {
     Rol.ADMINISTRADOR,
     Rol.SUPERADMINISTRADOR,
   )
-  @ApiResponse({ status: 200, description: 'ID de empadronamiento encontrado' })
-  @ApiOperation({ summary: 'Buscar empadronamiento por ID' })
   @Get(':id')
   async findOne(@Param('id') id: number) {
     try {
@@ -85,8 +70,6 @@ export class EmpadronamientoController {
   }
 
   @Roles(Rol.ADMINISTRADOR, Rol.SUPERADMINISTRADOR)
-  @ApiResponse({ status: 200, description: 'Actualizado existosamente' })
-  @ApiOperation({ summary: 'Actualizar un empadronamiento' })
   @Patch(':id')
   update(
     @Param('id') id: number,
@@ -102,8 +85,6 @@ export class EmpadronamientoController {
   }
 
   @Roles(Rol.ADMINISTRADOR, Rol.SUPERADMINISTRADOR)
-  @ApiResponse({ status: 200, description: 'Cambio de estado exitoso' })
-  @ApiOperation({ summary: 'Cambiar estado a un empadronamiento' })
   @Patch('estado/:id')
   async estado(
     @Param('id') id: number,

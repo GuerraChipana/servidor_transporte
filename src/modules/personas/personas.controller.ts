@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { PersonaService } from './personas.service';
 import { CreatePersonaDto } from './dto/create-persona.dto'; // Asegúrate de importar el DTO
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt.auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -23,19 +22,13 @@ import { CambioEstadoPersonaDto } from './dto/estado-persona.dto';
 import { UserRequestRequest } from 'src/modules/user-request.Request';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiTags('Endpoints de Personas')
 @Controller('api/personas')
 export class PersonasController {
   constructor(private readonly personasService: PersonaService) {}
 
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
-  @ApiOperation({
-    summary: 'Registro de una persona con su dni y contraseña del encargado',
-  })
   @Post('registro')
   @HttpCode(201)
-  @ApiResponse({ status: 201, description: 'Persona creada con éxito.' })
-  @ApiResponse({ status: 500, description: 'Error al crear la persona.' })
   async create(
     @Body() createPersonaDto: CreatePersonaDto,
     @Request() req: UserRequestRequest,
@@ -75,10 +68,6 @@ export class PersonasController {
     Rol.ASISTENTE,
   )
   @Get()
-  @ApiOperation({
-    summary: 'Listar todas las personas',
-  })
-  @ApiResponse({ status: 200, description: 'Lista de personas.' })
   async listar(@Request() req: UserRequestRequest) {
     const rol = req.user.rol;
 
@@ -99,11 +88,6 @@ export class PersonasController {
     Rol.ASISTENTE,
   )
   @Get(':id')
-  @ApiOperation({
-    summary: 'Buscar persona por su ID',
-  })
-  @ApiResponse({ status: 200, description: 'Persona encontrada.' })
-  @ApiResponse({ status: 404, description: 'Persona no encontrada.' })
   async findById(@Param('id') id: number) {
     try {
       return await this.personasService.findById(id);
@@ -114,15 +98,7 @@ export class PersonasController {
   }
 
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
-  @ApiOperation({
-    summary: 'Cambiar de estado a una persona',
-  })
   @Patch(':id/estado')
-  @ApiResponse({
-    status: 200,
-    description: 'Estado de la persona actualizado.',
-  })
-  @ApiResponse({ status: 404, description: 'Persona no encontrada.' })
   async changeStatus(
     @Param('id') id: number,
     @Body() cambioEstadoPersonaDto: CambioEstadoPersonaDto,
@@ -145,13 +121,9 @@ export class PersonasController {
   }
 
   @Roles(Rol.SUPERADMINISTRADOR, Rol.ADMINISTRADOR)
-  @ApiOperation({
-    summary: 'actualizar datos de una persona',
-  })
+ 
   @Patch(':id')
-  @ApiResponse({ status: 200, description: 'Persona actualizada.' })
-  @ApiResponse({ status: 404, description: 'Persona no encontrada.' })
-  async update(
+   async update(
     @Param('id') id: number,
     @Body() updatePersonaDto: UpdatePersonaDto,
     @Request() req: UserRequestRequest,

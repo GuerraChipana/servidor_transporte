@@ -13,7 +13,7 @@ import {
   VehiculoSeguro,
 } from './entities/vehiculo-seguro.entity';
 import { Aseguradora } from '../aseguradoras/entities/aseguradora.entity';
-import { parseISO, isBefore } from 'date-fns';
+import { isBefore } from 'date-fns';
 import { CambioEstadoSeguroVehiculoDto } from './dto/cambioestado-conductore.dto';
 
 @Injectable()

@@ -6,7 +6,6 @@ import { AuthModule } from './modules/auth/auth.module';
 import { join } from 'path';
 import { PersonasModule } from './modules/personas/personas.module';
 import { ImagenesModule } from './modules/imagenes/imagenes.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
 import { AsociacionesModule } from './modules/asociaciones/asociaciones.module';
 import { AseguradorasModule } from './modules/aseguradoras/aseguradoras.module';
 import { ConductoresModule } from './modules/conductores/conductores.module';
@@ -36,10 +35,7 @@ import { BusquedaModule } from './modules/busqueda/busqueda.module';
         synchronize: false,
       }),
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'imagenes'), // Ruta donde se almacenan las imágenes
-      serveRoot: '/imagenes/', // Ruta base para acceder a las imágenes
-    }),
+   
     AsociacionesModule,
     AseguradorasModule,
     ConductoresModule,

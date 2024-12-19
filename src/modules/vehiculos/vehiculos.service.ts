@@ -9,7 +9,7 @@ import { CreateVehiculoDto } from './dto/create-vehiculo.dto';
 import { UpdateVehiculoDto } from './dto/update-vehiculo.dto';
 import { Vehiculo } from './entities/vehiculo.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Not, Repository } from 'typeorm';
+import {  Not, Repository } from 'typeorm';
 import { Persona } from '../personas/entities/persona.entity';
 import { CambioEstadoVehiculoDto } from './dto/cambioestado-vehiculo.dto';
 
