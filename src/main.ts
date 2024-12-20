@@ -8,7 +8,12 @@ dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.enableCors();
+  // Configuración de CORS para permitir solo dos orígenes específicos
+  app.enableCors({
+    origin: ['http://localhost:5173', 'https://transportevehicular.munitai.gob.pe'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos (ajusta según lo necesario)
+    allowedHeaders: ['Content-Type', 'Authorization'], // Cabeceras permitidas (ajusta según lo necesario)
+  });
 
   // Uso de ValidationPipe globalmente
   app.useGlobalPipes(
