@@ -33,7 +33,9 @@ export class BusquedaService {
       .leftJoinAndSelect('empadronamiento.id_vehiculo', 'vehiculo') // JOIN VEHICULO
       .leftJoinAndSelect('vehiculo.vehiculosSeguros', 'vehiculoSeguro') // JOIN VEHICULOSEGURO
       .leftJoinAndSelect('vehiculo.Tucs', 'tuc') // JOIN TUC
-      .leftJoinAndSelect('tuc.id_asociacion', 'asociacion') // JOIN ASSOCIACION
+      .leftJoinAndSelect('tuc.id_asociacion', 'asociacion') // JOIN ASOCIACION
+      .leftJoinAndSelect('vehiculo.propietario1', 'propietario1') // JOIN PROPIETARIO 1
+      .leftJoinAndSelect('vehiculo.propietario2', 'propietario2') // JOIN PROPIETARIO 2
       .where('empadronamiento.n_empadronamiento = :n_empadronamiento', {
         n_empadronamiento: n_empadro,
       })
@@ -55,8 +57,14 @@ export class BusquedaService {
         'tuc.estado_vigencia', // Estado de vigencia del TUC
         'tuc.id_asociacion',
         'asociacion.nombre', // Nombre de la Asociación
+        'propietario1.nombre', // Nombre del propietario 1
+        'propietario1.apPaterno', // Apellido paterno del propietario 1
+        'propietario1.apMaterno', // Apellido materno del propietario 1
+        'propietario2.nombre', // Nombre del propietario 2
+        'propietario2.apPaterno', // Apellido paterno del propietario 2
+        'propietario2.apMaterno', // Apellido materno del propietario 2
       ])
-      .getOne(); // Queremos solo un resultado
+      .getOne();
 
     if (!query) {
       throw new Error(
@@ -92,6 +100,23 @@ export class BusquedaService {
         ? tucsActivos[0].id_asociacion?.nombre
         : 'No Asociado';
 
+    // Obtener propietarios y devolver en formato prop1, prop2, etc.
+    const propietarios: any = {};
+    if (empadronamiento.id_vehiculo.propietario1) {
+      propietarios['prop1'] = {
+        nombre: empadronamiento.id_vehiculo.propietario1.nombre,
+        apPaterno: empadronamiento.id_vehiculo.propietario1.apPaterno,
+        apMaterno: empadronamiento.id_vehiculo.propietario1.apMaterno,
+      };
+    }
+    if (empadronamiento.id_vehiculo.propietario2) {
+      propietarios['prop2'] = {
+        nombre: empadronamiento.id_vehiculo.propietario2.nombre,
+        apPaterno: empadronamiento.id_vehiculo.propietario2.apPaterno,
+        apMaterno: empadronamiento.id_vehiculo.propietario2.apMaterno,
+      };
+    }
+
     return {
       n_empadronamiento: empadronamiento.n_empadronamiento,
       vehiculo: {
@@ -108,18 +133,20 @@ export class BusquedaService {
       asociacion: asociacion,
       numeroTuc: numeroTuc,
       estadoVigenciaTuc: estadoVigenciaTuc,
+      propietarios: propietarios, // Mostrar propietarios como prop1, prop2, etc.
     };
   }
-  
+
   // Método de búsqueda por placa
   async buscarPorPlaca(placa: string) {
-    // Buscar el vehículo por su placa
     const vehiculo = await this.vehiculoRepo
       .createQueryBuilder('vehiculo')
       .leftJoinAndSelect('vehiculo.vehiculosSeguros', 'vehiculoSeguro') // JOIN VEHICULOSEGURO
       .leftJoinAndSelect('vehiculo.Tucs', 'tuc') // JOIN TUC
       .leftJoinAndSelect('tuc.id_asociacion', 'asociacion') // JOIN ASOCIACION
       .leftJoinAndSelect('vehiculo.EmpadronamientoVehiculo', 'empadronamiento') // JOIN EMPADRONAMIENTO
+      .leftJoinAndSelect('vehiculo.propietario1', 'propietario1') // JOIN PROPIETARIO 1
+      .leftJoinAndSelect('vehiculo.propietario2', 'propietario2') // JOIN PROPIETARIO 2
       .where('vehiculo.placa = :placa', { placa })
       .andWhere('vehiculo.estado = :estado', { estado: 1 }) // Vehículo activo
       .select([
@@ -138,6 +165,12 @@ export class BusquedaService {
         'tuc.estado',
         'tuc.estado_vigencia',
         'asociacion.nombre', // Nombre de la Asociación
+        'propietario1.nombre', // Nombre del propietario 1
+        'propietario1.apPaterno', // Apellido paterno del propietario 1
+        'propietario1.apMaterno', // Apellido materno del propietario 1
+        'propietario2.nombre', // Nombre del propietario 2
+        'propietario2.apPaterno', // Apellido paterno del propietario 2
+        'propietario2.apMaterno', // Apellido materno del propietario 2
       ])
       .getOne();
 
@@ -178,7 +211,23 @@ export class BusquedaService {
         ? tucsActivos[0].id_asociacion?.nombre
         : 'No Asociado';
 
-    // Respuesta con los datos del vehículo y sus relaciones
+    // Obtener propietarios y devolver en formato prop1, prop2, etc.
+    const propietarios: any = {};
+    if (vehiculo.propietario1) {
+      propietarios['prop1'] = {
+        nombre: vehiculo.propietario1.nombre,
+        apPaterno: vehiculo.propietario1.apPaterno,
+        apMaterno: vehiculo.propietario1.apMaterno,
+      };
+    }
+    if (vehiculo.propietario2) {
+      propietarios['prop2'] = {
+        nombre: vehiculo.propietario2.nombre,
+        apPaterno: vehiculo.propietario2.apPaterno,
+        apMaterno: vehiculo.propietario2.apMaterno,
+      };
+    }
+
     return {
       vehiculo: {
         id_vehiculo: vehiculo.id,
@@ -198,6 +247,7 @@ export class BusquedaService {
       asociacion: asociacion,
       numeroTuc: numeroTuc,
       estadoVigenciaTuc: estadoVigenciaTuc,
+      propietarios: propietarios, // Mostrar propietarios como prop1, prop2, etc.
     };
   }
 }
