@@ -104,16 +104,24 @@ export class BusquedaService {
     const propietarios: any = {};
     if (empadronamiento.id_vehiculo.propietario1) {
       propietarios['prop1'] = {
-        nombre: empadronamiento.id_vehiculo.propietario1.nombre,
+        nombre: this.getNombreAbreviado(
+          empadronamiento.id_vehiculo.propietario1.nombre,
+        ),
         apPaterno: empadronamiento.id_vehiculo.propietario1.apPaterno,
-        apMaterno: empadronamiento.id_vehiculo.propietario1.apMaterno,
+        apMaterno: this.getInitials(
+          empadronamiento.id_vehiculo.propietario1.apMaterno,
+        ),
       };
     }
     if (empadronamiento.id_vehiculo.propietario2) {
       propietarios['prop2'] = {
-        nombre: empadronamiento.id_vehiculo.propietario2.nombre,
+        nombre: this.getNombreAbreviado(
+          empadronamiento.id_vehiculo.propietario2.nombre,
+        ),
         apPaterno: empadronamiento.id_vehiculo.propietario2.apPaterno,
-        apMaterno: empadronamiento.id_vehiculo.propietario2.apMaterno,
+        apMaterno: this.getInitials(
+          empadronamiento.id_vehiculo.propietario2.apMaterno,
+        ),
       };
     }
 
@@ -135,6 +143,17 @@ export class BusquedaService {
       estadoVigenciaTuc: estadoVigenciaTuc,
       propietarios: propietarios, // Mostrar propietarios como prop1, prop2, etc.
     };
+  }
+
+  // Método para obtener solo el primer nombre
+  private getNombreAbreviado(nombre: string): string {
+    const nombres = nombre.split(' ');
+    return `${nombres[0]} ${nombres[1]?.charAt(0) || ''}.`; // Primer nombre y primer letra del segundo nombre
+  }
+
+  // Método para obtener las iniciales del apellido materno
+  private getInitials(apMaterno: string): string {
+    return apMaterno.charAt(0).toUpperCase() + '.';
   }
 
   // Método de búsqueda por placa
@@ -215,16 +234,16 @@ export class BusquedaService {
     const propietarios: any = {};
     if (vehiculo.propietario1) {
       propietarios['prop1'] = {
-        nombre: vehiculo.propietario1.nombre,
+        nombre: this.getNombreAbreviado(vehiculo.propietario1.nombre),
         apPaterno: vehiculo.propietario1.apPaterno,
-        apMaterno: vehiculo.propietario1.apMaterno,
+        apMaterno: this.getInitials(vehiculo.propietario1.apMaterno),
       };
     }
     if (vehiculo.propietario2) {
       propietarios['prop2'] = {
-        nombre: vehiculo.propietario2.nombre,
+        nombre: this.getNombreAbreviado(vehiculo.propietario2.nombre),
         apPaterno: vehiculo.propietario2.apPaterno,
-        apMaterno: vehiculo.propietario2.apMaterno,
+        apMaterno: this.getInitials(vehiculo.propietario2.apMaterno),
       };
     }
 
