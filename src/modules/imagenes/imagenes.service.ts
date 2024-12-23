@@ -2,10 +2,10 @@ import { Injectable, BadRequestException, NotFoundException } from '@nestjs/comm
 import * as path from 'path';
 import * as FTP from 'ftp';
 import { Readable } from 'stream';
+import * as multer from 'multer';
 
 @Injectable()
 export class ImagenesService {
-  private readonly uploadDir = './imagenes'; // Directorio donde se almacenarán las imágenes temporalmente
   private ftpClient: FTP; // Instancia del cliente FTP/FTPS
 
   constructor() {
@@ -189,7 +189,7 @@ export class ImagenesService {
       fieldname: 'imagen',
       originalname: fileName,
       encoding: '7bit',
-      mimetype: 'image/jpeg', // Ajustar según el tipo real de la imagen
+      mimetype: 'image/jpeg', //
       buffer: imageBuffer,
       size: imageBuffer.length,
       stream: null,

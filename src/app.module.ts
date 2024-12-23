@@ -15,6 +15,7 @@ import { VehiculoSegurosModule } from './modules/vehiculo-seguros/vehiculo-segur
 import { TucModule } from './modules/tuc/tuc.module';
 import { EmpadronamientoModule } from './modules/empadronamiento/empadronamiento.module';
 import { BusquedaModule } from './modules/busqueda/busqueda.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -46,7 +47,7 @@ import { BusquedaModule } from './modules/busqueda/busqueda.module';
     EmpadronamientoModule,
     BusquedaModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {}

@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserSistemaDto } from './dto/create-user_sistema.dto';
 import { UserSistema } from './entities/user_sistema.entity';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs'; 
 import { CambiarCredencialesDto } from './dto/cambio-credenciales-user_sistema.dto';
 import { CambioEstadoUserDto } from './dto/cambio_estado-user_sistema.dto';
 
