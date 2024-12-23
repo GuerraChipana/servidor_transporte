@@ -44,31 +44,42 @@ export class PersonaService {
     }
 
     // Llamada a la API
-    const apiUrl = `${process.env.RENIEC_API}?nuDniConsulta=${dni}&nuDniUsuario=${user.dni}&nuRucUsuario=${process.env.RENIEC_RUC}&password=${password_consulta}&out=json`;
+    const apiUrl = `http://192.168.55.107:3000/api/reniec?nuDniConsulta=${dni}&nuDniUsuario=${user.dni}&nuRucUsuario=${process.env.RENIEC_RUC}&password=${password_consulta}&out=json`;
     console.log('URL de la API:', apiUrl);
 
     let personaData: DatosPersona;
     try {
-      const response: AxiosResponse = await lastValueFrom(this.httpService.get(apiUrl));
+      const response: AxiosResponse = await lastValueFrom(
+        this.httpService.get(apiUrl),
+      );
       personaData = response.data.consultarResponse?.return?.datosPersona;
 
       if (!personaData) {
-        throw new InternalServerErrorException('Datos de persona no encontrados');
+        throw new InternalServerErrorException(
+          'Datos de persona no encontrados',
+        );
       }
     } catch (error) {
       this.handleApiError(error);
     }
 
     // Validar datos necesarios
-    const { prenombres, apPrimer, apSegundo, direccion, ubigeo, foto } = personaData;
+    const { prenombres, apPrimer, apSegundo, direccion, ubigeo, foto } =
+      personaData;
 
     // Subir la imagen a la subcarpeta "personas"
     let imageUrl;
     try {
       const subFolder = 'personas';
-      imageUrl = await this.imagenesService.uploadBase64Image(foto, `${dni}.jpg`, subFolder);
+      imageUrl = await this.imagenesService.uploadBase64Image(
+        foto,
+        `${dni}.jpg`,
+        subFolder,
+      );
     } catch (error) {
-      throw new InternalServerErrorException(`Error al subir la imagen: ${error.message}`);
+      throw new InternalServerErrorException(
+        `Error al subir la imagen: ${error.message}`,
+      );
     }
 
     // Validar si el DNI y el email ya existen, en paralelo
@@ -102,7 +113,9 @@ export class PersonaService {
     try {
       return await this.personaRepository.save(persona);
     } catch (error) {
-      throw new InternalServerErrorException('Error al guardar la persona: ' + error.message);
+      throw new InternalServerErrorException(
+        'Error al guardar la persona: ' + error.message,
+      );
     }
   }
 
@@ -123,12 +136,36 @@ export class PersonaService {
         case 'superadministrador':
           return persona; // Todo lo puede visualizar
         case 'administrador':
-          const { id_usuario, id_usuario_modificacion, fecha_registro, fecha_modificacion, ...RestoDatos } = persona;
+          const {
+            id_usuario,
+            id_usuario_modificacion,
+            fecha_registro,
+            fecha_modificacion,
+            ...RestoDatos
+          } = persona;
           return RestoDatos; // Todo los campos menos los excluidos
         case 'moderador':
         case 'asistente':
-          const { id, dni, nombre, apPaterno, apMaterno, telefono, foto, email } = persona;
-          return { id, dni, nombre, apPaterno, apMaterno, telefono, foto, email };
+          const {
+            id,
+            dni,
+            nombre,
+            apPaterno,
+            apMaterno,
+            telefono,
+            foto,
+            email,
+          } = persona;
+          return {
+            id,
+            dni,
+            nombre,
+            apPaterno,
+            apMaterno,
+            telefono,
+            foto,
+            email,
+          };
         default:
           return {};
       }
@@ -154,13 +191,18 @@ export class PersonaService {
     }
 
     persona.estado = cambioEstadoPersonaDto.estado;
-    persona.detalle_baja = cambioEstadoPersonaDto.estado === 0 ? cambioEstadoPersonaDto.detalle_baja : null;
+    persona.detalle_baja =
+      cambioEstadoPersonaDto.estado === 0
+        ? cambioEstadoPersonaDto.detalle_baja
+        : null;
     persona.id_usuario_modificacion = usuarioModificacion.id_user;
 
     try {
       return await this.personaRepository.save(persona);
     } catch (error) {
-      throw new InternalServerErrorException('Error al cambiar estado: ' + error.message);
+      throw new InternalServerErrorException(
+        'Error al cambiar estado: ' + error.message,
+      );
     }
   }
 
@@ -203,7 +245,9 @@ export class PersonaService {
     try {
       return await this.personaRepository.save(persona);
     } catch (error) {
-      throw new InternalServerErrorException('Error al actualizar la persona: ' + error.message);
+      throw new InternalServerErrorException(
+        'Error al actualizar la persona: ' + error.message,
+      );
     }
   }
 
@@ -213,9 +257,13 @@ export class PersonaService {
         `Error en la API: ${JSON.stringify(error.response.data)}`,
       );
     } else if (error.request) {
-      throw new InternalServerErrorException('No se recibió respuesta de la API');
+      throw new InternalServerErrorException(
+        'No se recibió respuesta de la API',
+      );
     } else {
-      throw new InternalServerErrorException(`Error al configurar la solicitud: ${error.message}`);
+      throw new InternalServerErrorException(
+        `Error al configurar la solicitud: ${error.message}`,
+      );
     }
   }
 }
