@@ -31,6 +31,26 @@ export class CreatePersonaDto {
   email?: string;
 
   @IsString()
-  @IsNotEmpty({ message: 'La contraseña no puede estar vacía' })
-  password_consulta: string;
+  @IsNotEmpty({ message: 'El nombre no puede estar vacio' })
+  nombre: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Apellido Paterno no puede estar vacio' })
+  apPaterno: string;
+
+  @IsString()
+  @IsOptional()
+  @IsNotEmpty({ message: 'Apellido Materno no puede estar vacio' })
+  apMaterno?: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Direccion no puede estar vacio' })
+  direccion: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Ubigeo no puede estar vacio' })
+  ubigeo: string;
+
+  @IsOptional()
+  foto?: string;
 }

@@ -71,8 +71,4 @@ export class BusquedaController {
     }
   }
 
-  @Get('hola')
-  getHola(): string {
-    return 'Conectado';
-  }
 }

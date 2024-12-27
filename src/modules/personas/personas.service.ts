@@ -16,6 +16,7 @@ import { AxiosResponse } from 'axios';
 import { DatosPersona } from './datos-persona.interface';
 import { UpdatePersonaDto } from './dto/update-persona.dto';
 import { CambioEstadoPersonaDto } from './dto/estado-persona.dto';
+import { BuscarPersonaDto } from './dto/buscar-persona.dto';
 import { CreatePersonaDto } from './dto/create-persona.dto';
 
 @Injectable()
@@ -31,12 +32,11 @@ export class PersonaService {
     private readonly imagenesService: ImagenesService,
   ) {}
 
-  // Servicio para crear Persona //
-  async create(
-    createPersonaDto: CreatePersonaDto,
+  async consultarPersona(
+    bucarPersonaDto: BuscarPersonaDto,
     id_user: number,
-  ): Promise<Persona> {
-    const { dni, telefono, email, password_consulta } = createPersonaDto;
+  ): Promise<any> {
+    const { dni, password_consulta } = bucarPersonaDto;
 
     const user = await this.userRepository.findOne({ where: { id_user } });
     if (!user) {
@@ -44,7 +44,7 @@ export class PersonaService {
     }
 
     // Llamada a la API
-    const apiUrl = `http://192.168.55.107:3000/api/reniec?nuDniConsulta=${dni}&nuDniUsuario=${user.dni}&nuRucUsuario=${process.env.RENIEC_RUC}&password=${password_consulta}&out=json`;
+    const apiUrl = `${process.env.RENIEC_API}/api/proxy/reniec?nuDniConsulta=${dni}&nuDniUsuario=${user.dni}&nuRucUsuario=${process.env.RENIEC_RUC}&password=${password_consulta}&out=json`;
     console.log('URL de la API:', apiUrl);
 
     let personaData: DatosPersona;
@@ -63,11 +63,60 @@ export class PersonaService {
       this.handleApiError(error);
     }
 
-    // Validar datos necesarios
+    // Validar los datos y preparar los datos a retornar (sin subir la imagen)
     const { prenombres, apPrimer, apSegundo, direccion, ubigeo, foto } =
       personaData;
 
-    // Subir la imagen a la subcarpeta "personas"
+    // Retornar los datos sin subir la imagen
+    return {
+      dni,
+      nombre: prenombres,
+      apPaterno: apPrimer,
+      apMaterno: apSegundo,
+      direccion,
+      ubigeo,
+      foto, // Devolver la imagen en Base64 sin subirla
+    };
+  }
+
+  // Servicio para crear Persona //
+  async crearPersona(
+    createPersonaDto: CreatePersonaDto,
+    id_usuario: number,
+  ): Promise<Persona> {
+    const {
+      dni,
+      telefono,
+      email,
+      nombre,
+      apPaterno,
+      apMaterno,
+      direccion,
+      ubigeo,
+      foto,
+    } = createPersonaDto;
+
+    // 2. Verificar si el usuario existe
+    const user = await this.userRepository.findOne({
+      where: { id_user: id_usuario },
+    });
+    if (!user) {
+      throw new InternalServerErrorException('Usuario no encontrado');
+    }
+
+    const [existingPersonaByDni, existingPersonaByEmail] = await Promise.all([
+      this.personaRepository.findOne({ where: { dni } }),
+      email ? this.personaRepository.findOne({ where: { email } }) : null,
+    ]);
+
+    if (existingPersonaByDni) {
+      throw new ConflictException('Ya existe una persona con este DNI.');
+    }
+    if (existingPersonaByEmail) {
+      throw new ConflictException('Ya existe una persona con este email.');
+    }
+
+    // 4. Subir la imagen solo si es necesario
     let imageUrl;
     try {
       const subFolder = 'personas';
@@ -82,36 +131,47 @@ export class PersonaService {
       );
     }
 
-    // Validar si el DNI y el email ya existen, en paralelo
-    const [existingPersonaByDni, existingPersonaByEmail] = await Promise.all([
-      this.personaRepository.findOne({ where: { dni } }),
-      email ? this.personaRepository.findOne({ where: { email } }) : null,
-    ]);
-
-    if (existingPersonaByDni) {
-      throw new ConflictException('Ya existe una persona con este DNI.');
-    }
-    if (existingPersonaByEmail) {
-      throw new ConflictException('Ya existe una persona con este email.');
-    }
-
-    // Crear la entidad Persona
+    // 5. Crear la entidad Persona
     const persona = this.personaRepository.create({
-      id_usuario: user,
+      id_usuario: user, // Solo se guarda el ID de usuario
       dni,
-      nombre: prenombres,
-      apPaterno: apPrimer,
-      apMaterno: apSegundo,
+      nombre,
+      apPaterno: apPaterno,
+      apMaterno: apMaterno,
       domicilio: direccion,
       ubigeo,
       telefono,
       email,
-      foto: imageUrl,
+      foto: imageUrl, // Foto ya subida de manera definitiva
     });
 
-    // Guardar la entidad
+    // 6. Guardar la persona en la base de datos
     try {
-      return await this.personaRepository.save(persona);
+      const savedPersona = await this.personaRepository.save(persona);
+
+      // 7. Recuperar los detalles de la persona guardada, con las relaciones necesarias
+      const personaDetalle = await this.personaRepository.findOne({
+        where: { id: savedPersona.id },
+        relations: ['id_usuario'], // Si deseas devolver detalles del usuario relacionado
+        select: {
+          id: true,
+          dni: true,
+          nombre: true,
+          apPaterno: true,
+          apMaterno: true,
+          domicilio: true,
+          ubigeo: true,
+          telefono: true,
+          email: true,
+          foto: true,
+          id_usuario: {
+            id_user: true,
+          },
+        },
+      });
+
+      // 8. Devolver los datos relevantes (sin el objeto completo de usuario)
+      return personaDetalle;
     } catch (error) {
       throw new InternalServerErrorException(
         'Error al guardar la persona: ' + error.message,
