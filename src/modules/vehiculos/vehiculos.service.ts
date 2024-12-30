@@ -214,7 +214,7 @@ export class VehiculosService {
           if (oldImageName) {
             await this.imagenesService.eliminarImagen(
               oldImageName,
-              'vehiculos',
+              'img_vehi',
             );
           }
         }

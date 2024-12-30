@@ -119,7 +119,7 @@ export class PersonaService {
     // 4. Subir la imagen solo si es necesario
     let imageUrl;
     try {
-      const subFolder = 'personas';
+      const subFolder = 'img_pers';
       imageUrl = await this.imagenesService.uploadBase64Image(
         foto,
         `${dni}.jpg`,
