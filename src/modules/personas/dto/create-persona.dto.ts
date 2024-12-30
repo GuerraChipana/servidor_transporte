@@ -23,11 +23,11 @@ export class CreatePersonaDto {
   })
   telefono?: string;
 
-  @IsOptional()
   @IsEmail({}, { message: 'El correo electrónico debe ser válido' })
   @Length(8, 100, {
     message: 'El correo electrónico debe tener entre 8 y 100 caracteres',
   })
+  @IsOptional()
   email?: string;
 
   @IsString()

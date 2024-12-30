@@ -1,10 +1,5 @@
-import {
-  IsOptional,
-  IsEmail,
-  IsNotEmpty,
-  Length,
-  Matches,
-} from 'class-validator';
+import { IsOptional, IsEmail, Length, Matches } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class UpdatePersonaDto {
   @IsOptional()
@@ -14,12 +9,12 @@ export class UpdatePersonaDto {
   telefono?: string;
 
   @IsOptional()
+  @Transform(({ value }) => (value === '' ? null : value)) // Transforma "" en null
   @IsEmail({}, { message: 'El correo electrónico debe ser válido' })
-  @IsNotEmpty({ message: 'El correo electrónico no puede estar vacío' })
   @Length(8, 100, {
     message: 'El correo electrónico debe tener entre 8 y 100 caracteres',
   })
-  email?: string;
+  email?: string | null;
 
   @IsOptional()
   @Length(0, 250, {
