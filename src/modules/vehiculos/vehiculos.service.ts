@@ -135,7 +135,7 @@ export class VehiculosService {
         imagenURL = await this.imagenesService.subirFileNormal(
           file,
           `vehiculo_${createVehiculoDto.placa}`,
-          'vehiculos',
+          'img_vehi',
         );
       } catch (error) {
         throw new BadRequestException(
@@ -222,7 +222,7 @@ export class VehiculosService {
         imagenURL = await this.imagenesService.subirFileNormal(
           file,
           `vehiculo_${vehiculo.placa}`, // Usamos la placa actual para el nombre de la imagen
-          'vehiculos', // carpeta 'vehiculos' dentro de 'imagenes'
+          'img_vehi', // carpeta 'vehiculos' dentro de 'imagenes'
         );
       } catch (error) {
         throw new BadRequestException(
