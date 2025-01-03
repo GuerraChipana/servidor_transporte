@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -44,7 +43,7 @@ export class PersonaService {
     }
 
     // Llamada a la API
-    const apiUrl = `${process.env.RENIEC_API}/api/proxy/reniec?nuDniConsulta=${dni}&nuDniUsuario=${user.dni}&nuRucUsuario=${process.env.RENIEC_RUC}&password=${password_consulta}&out=json`;
+    const apiUrl = `${process.env.RENIEC_API}?nuDniConsulta=${dni}&nuDniUsuario=${user.dni}&nuRucUsuario=${process.env.RENIEC_RUC}&password=${password_consulta}&out=json`;
     console.log('URL de la API:', apiUrl);
 
     let personaData: DatosPersona;
